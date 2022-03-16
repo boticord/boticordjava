@@ -30,4 +30,15 @@ public class Comments {
     public String getCreatedAt() {
         return createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "Comments{" +
+                "userId='" + userId + '\'' +
+                ", text='" + text + '\'' +
+                ", vote=" + vote +
+                ", isUpdated=" + isUpdated +
+                ", createdAt='" + createdAt + '\'' +
+                '}';
+    }
 }

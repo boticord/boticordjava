@@ -1,7 +1,6 @@
 package org.boticordjava.api.io;
 
 import com.google.gson.Gson;
-
 import java.net.http.HttpResponse;
 
 public class DefaultResponseTransformer<E> implements ResponseTransformer<E> {
