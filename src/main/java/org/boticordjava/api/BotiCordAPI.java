@@ -1,9 +1,9 @@
 package org.boticordjava.api;
 
 import org.boticordjava.api.entity.*;
-import org.boticordjava.api.impl.DiscordBotListAPIImpl;
+import org.boticordjava.api.impl.BotiCordAPIAPIImpl;
 
-public interface DiscordBotListAPI {
+public interface BotiCordAPI {
 
     Result setStats(int servers, int shards, int users);
 
@@ -27,14 +27,14 @@ public interface DiscordBotListAPI {
             return this;
         }
 
-        public DiscordBotListAPI build() {
+        public BotiCordAPI build() {
             if(token == null)
                 throw new IllegalArgumentException("The provided token cannot be null!");
 
             if(botId == null)
                 throw new IllegalArgumentException("The provided bot ID cannot be null!");
 
-            return new DiscordBotListAPIImpl(token, botId);
+            return new BotiCordAPIAPIImpl(token, botId);
         }
 
     }
