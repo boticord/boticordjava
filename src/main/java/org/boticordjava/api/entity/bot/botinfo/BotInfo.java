@@ -7,9 +7,9 @@ public class BotInfo {
     private String id;
     private String shortCode;
     private List<String> links;
-    private Information information;
+    private BotInformation information;
 
-    public Information getInformation() {
+    public BotInformation getInformation() {
         return information;
     }
 

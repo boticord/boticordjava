@@ -8,6 +8,8 @@ import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.bot.comments.Comments;
 import org.boticordjava.api.entity.Result;
+import org.boticordjava.api.entity.servers.ServerInfo;
+import org.boticordjava.api.entity.servers.ServerInformation;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
@@ -81,8 +83,16 @@ public class BotiCordAPIAPIImpl implements BotiCordAPI {
                 .addPathSegment("bot")
                 .addPathSegment(botId)
                 .build();
-        System.out.println("url: \n" + url);
         return get(url, new DefaultResponseTransformer<>(BotInfo.class, gson));
+    }
+
+    @Override
+    public ServerInfo getServerInformation(String botId) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("server")
+                .addPathSegment(botId)
+                .build();
+        return get(url, new DefaultResponseTransformer<>(ServerInfo.class, gson));
     }
 
     private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {

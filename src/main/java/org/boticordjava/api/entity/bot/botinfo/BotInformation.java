@@ -4,7 +4,7 @@ import org.boticordjava.api.entity.bot.stats.BotStats;
 
 import java.util.List;
 
-public class Information {
+public class BotInformation {
 
     private Integer bumps;
     private Integer added;
