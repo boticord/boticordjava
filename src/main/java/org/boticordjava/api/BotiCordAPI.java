@@ -1,6 +1,9 @@
 package org.boticordjava.api;
 
 import org.boticordjava.api.entity.*;
+import org.boticordjava.api.entity.bot.botinfo.BotInfo;
+import org.boticordjava.api.entity.bot.stats.BotStats;
+import org.boticordjava.api.entity.bot.comments.Comments;
 import org.boticordjava.api.impl.BotiCordAPIAPIImpl;
 
 public interface BotiCordAPI {
@@ -10,6 +13,8 @@ public interface BotiCordAPI {
     BotStats getBot(String botId);
 
     Comments[] getBotComments();
+
+    BotInfo getBotInformation(String botId);
 
     class Builder {
 

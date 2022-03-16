@@ -1,4 +1,4 @@
-package org.boticordjava.api.entity;
+package org.boticordjava.api.entity.bot.stats;
 
 public class BotStats {
 

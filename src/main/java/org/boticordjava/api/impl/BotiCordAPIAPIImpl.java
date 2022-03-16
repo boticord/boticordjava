@@ -4,8 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import okhttp3.HttpUrl;
 import org.boticordjava.api.BotiCordAPI;
-import org.boticordjava.api.entity.BotStats;
-import org.boticordjava.api.entity.Comments;
+import org.boticordjava.api.entity.bot.botinfo.BotInfo;
+import org.boticordjava.api.entity.bot.stats.BotStats;
+import org.boticordjava.api.entity.bot.comments.Comments;
 import org.boticordjava.api.entity.Result;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
@@ -72,6 +73,16 @@ public class BotiCordAPIAPIImpl implements BotiCordAPI {
         System.out.println(url);
 
         return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
+    }
+
+    @Override
+    public BotInfo getBotInformation(String botId) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("bot")
+                .addPathSegment(botId)
+                .build();
+        System.out.println("url: \n" + url);
+        return get(url, new DefaultResponseTransformer<>(BotInfo.class, gson));
     }
 
     private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {
