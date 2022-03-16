@@ -1,4 +1,6 @@
-package org.boticordjava.api.entity.servers;
+package org.boticordjava.api.entity.servers.serverinfo;
+
+import org.boticordjava.api.entity.servers.Bot;
 
 import java.util.List;
 

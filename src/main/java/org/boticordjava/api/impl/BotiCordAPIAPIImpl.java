@@ -6,10 +6,9 @@ import okhttp3.HttpUrl;
 import org.boticordjava.api.BotiCordAPI;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.bot.stats.BotStats;
-import org.boticordjava.api.entity.bot.comments.Comments;
+import org.boticordjava.api.entity.comments.Comments;
 import org.boticordjava.api.entity.Result;
-import org.boticordjava.api.entity.servers.ServerInfo;
-import org.boticordjava.api.entity.servers.ServerInformation;
+import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
@@ -93,6 +92,16 @@ public class BotiCordAPIAPIImpl implements BotiCordAPI {
                 .addPathSegment(botId)
                 .build();
         return get(url, new DefaultResponseTransformer<>(ServerInfo.class, gson));
+    }
+
+    @Override
+    public Comments[] getServerComments(String serverId) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("server")
+                .addPathSegment(serverId)
+                .addPathSegment("comments")
+                .build();
+        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
     }
 
     private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {

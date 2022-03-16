@@ -1,4 +1,4 @@
-package org.boticordjava.api.entity.servers;
+package org.boticordjava.api.entity.servers.serverinfo;
 
 import java.util.Arrays;
 import java.util.List;

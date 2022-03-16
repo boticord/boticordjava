@@ -1,4 +1,4 @@
-package org.boticordjava.api.entity.bot.comments;
+package org.boticordjava.api.entity.comments;
 
 import com.google.gson.annotations.SerializedName;
 

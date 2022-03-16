@@ -1,4 +1,4 @@
-package org.boticordjava.api.entity.servers;
+package org.boticordjava.api.entity.servers.serverinfo;
 
 public class ServerLinks {
 

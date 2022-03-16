@@ -2,10 +2,9 @@ package org.boticordjava.api;
 
 import org.boticordjava.api.entity.Result;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
-import org.boticordjava.api.entity.bot.comments.Comments;
 import org.boticordjava.api.entity.bot.stats.BotStats;
-import org.boticordjava.api.entity.servers.ServerInfo;
-import org.boticordjava.api.entity.servers.ServerInformation;
+import org.boticordjava.api.entity.comments.Comments;
+import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.impl.BotiCordAPIAPIImpl;
 
 public interface BotiCordAPI {
@@ -16,7 +15,7 @@ public interface BotiCordAPI {
      * @param users   users count
      *                <p>Example:
      *                <p>AtomicInteger usersCount = new AtomicInteger();
-     *                BotStartConfig.jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
+     *                <p>jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
      * @return {@link Result}
      */
     Result setStats(int servers, int shards, int users);
@@ -29,7 +28,7 @@ public interface BotiCordAPI {
 
     /**
      * Example:
-     * <p> Comments[] comments = discordBotListAPI.getBotComments();
+     * <p> Comments[] comments = api.getBotComments();
      * <p> for (int i = 0; i < comments.length; i++) {
      * <p>   System.out.println(comments[i].getUserId());
      * <p> }
@@ -50,6 +49,20 @@ public interface BotiCordAPI {
      */
     ServerInfo getServerInformation(String botId);
 
+    /**
+     *
+     * @param serverId String serverID
+     *
+     * Example:
+     * <p> Comments[] comments = api.getServerComments(serverId);
+     * <p> for (int i = 0; i < comments.length; i++) {
+     * <p>   System.out.println(comments[i].getUserId());
+     * <p> }
+     *
+     * @return {@link Comments}
+     */
+    Comments[] getServerComments(String serverId);
+
     class Builder {
 
         // Required
@@ -67,7 +80,6 @@ public interface BotiCordAPI {
         }
 
         /**
-         *
          * @throws IllegalArgumentException if token or botId null
          */
         public BotiCordAPI build() {

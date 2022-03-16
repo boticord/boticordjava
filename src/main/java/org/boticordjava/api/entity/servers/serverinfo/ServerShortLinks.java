@@ -1,8 +1,9 @@
-package org.boticordjava.api.entity.servers;
+package org.boticordjava.api.entity.servers.serverinfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class ServerShortLinks {
 
     List<String> list;
