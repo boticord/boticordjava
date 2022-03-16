@@ -15,7 +15,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 	<groupId>com.github.megoRU</groupId>
 	<artifactId>boticordjava</artifactId>
-	<version>-SNAPSHOT</version>
+	<version>e5e609fae4</version>
 </dependency>
 
 ```
