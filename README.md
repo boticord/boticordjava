@@ -22,11 +22,10 @@ https://jitpack.io/#megoRU/boticordjava
 
 ## Examples
 
-####Get All Comments by bot ID
+**Get All Comments by bot ID**
+
 ```
-BotiCordAPI api = new BotiCordAPIAPIImpl(
-"YOUR_TOKEN",
-"BOT_ID");
+BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
 
 Comments[] comments = api.getBotComments();
 
@@ -36,12 +35,10 @@ System.out.println(comments[i].getUserId());
 }
 ```
 
-####Update Stats
+**Update Stats**
 
 ```
-BotiCordAPI api = new BotiCordAPIAPIImpl(
-"YOUR_TOKEN",
-"BOT_ID");
+BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
 
 int servers = ...; // the server count
 int shards = ...; // shards count
