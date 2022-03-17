@@ -14,11 +14,11 @@
 An API wrapper for https://boticord.top/ written in Java by @megoRU
 
 
-### Add to Maven
+### Maven
 
 https://jitpack.io/#megoRU/boticordjava
 
-```
+```xml
 <repositories>
  <repository>
 	<id>jitpack.io</id>
@@ -38,7 +38,7 @@ https://jitpack.io/#megoRU/boticordjava
 
 ### Get All Comments by bot ID
 
-```
+```java
 public static void main(String[] args) {
 
     BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
@@ -53,7 +53,7 @@ public static void main(String[] args) {
 
 ### Update Stats
 
-```
+```java
 public static void main(String[] args) {
 
     BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
