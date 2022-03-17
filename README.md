@@ -41,7 +41,7 @@ https://jitpack.io/#megoRU/boticordjava
 ```java
 public static void main(String[] args) {
 
-    BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
+    BotiCordAPI api = new BotiCordAPIImpl("YOUR_TOKEN", "BOT_ID");
     Comments[] comments = api.getBotComments();
 
     for (int i = 0; i < comments.length; i++) {
@@ -56,7 +56,7 @@ public static void main(String[] args) {
 ```java
 public static void main(String[] args) {
 
-    BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
+    BotiCordAPI api = new BotiCordAPIImpl("YOUR_TOKEN", "BOT_ID");
 
     int servers = ...; // the server count
     int shards = ...; // shards count
