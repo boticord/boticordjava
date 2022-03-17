@@ -15,8 +15,6 @@ public class DefaultResponseTransformer<E> implements ResponseTransformer<E> {
 
     @Override
     public E transform(HttpResponse<String> response) {
-        System.out.println(response.body());
-
         return gson.fromJson(response.body(), aClass);
     }
 }

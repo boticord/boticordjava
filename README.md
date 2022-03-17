@@ -1,7 +1,21 @@
-# boticordjava
-An API wrapper for BotiCord API written in Java by (@megoru)
+<center>
 
-### Add to MAVEN
+<p>
+    <a href="https://boticord.top"><img src="https://megoru.ru/boticordapi.png"  alt="boticord.js"/></a>
+<p>
+<p>
+    <a href="https://discord.gg/hkHjW8a"><img src="https://img.shields.io/discord/722424773233213460?color=7289da&label=Discord&logo=discord&logoColor=white" alt="Online"></a>
+
+</p>
+
+</center>
+
+# BotiCordJava
+An API wrapper for https://boticord.top/ written in Java by @megoRU
+
+
+### Add to Maven
+
 https://jitpack.io/#megoRU/boticordjava
 
 ```
@@ -22,32 +36,37 @@ https://jitpack.io/#megoRU/boticordjava
 
 ## Examples
 
-**Get All Comments by bot ID**
+### Get All Comments by bot ID
 
 ```
-BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
+public static void main(String[] args) {
 
-Comments[] comments = api.getBotComments();
+    BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
+    Comments[] comments = api.getBotComments();
 
-for (int i = 0; i < comments.length; i++) {
-System.out.println(comments[i].getText());
-System.out.println(comments[i].getUserId());
+    for (int i = 0; i < comments.length; i++) {
+    System.out.println(comments[i].getText());
+    System.out.println(comments[i].getUserId());
+   }
 }
 ```
 
-**Update Stats**
+### Update Stats
 
 ```
-BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
+public static void main(String[] args) {
 
-int servers = ...; // the server count
-int shards = ...; // shards count
-int users = ...; // the amount of users
+    BotiCordAPI api = new BotiCordAPIAPIImpl("YOUR_TOKEN", "BOT_ID");
 
-api.setStats(servers, shards, users);
+    int servers = ...; // the server count
+    int shards = ...; // shards count
+    int users = ...; // the amount of users
+
+    api.setStats(servers, shards, users);
+}    
 ```
 
-##Links
+## Links
 
 * [BotiCord](https://boticord.top/)
 * [Support](https://boticord.top/discord)
