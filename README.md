@@ -1,5 +1,5 @@
-<center>
-
+<div align="center ">
+	
 <p>
     <a href="https://boticord.top"><img src="https://megoru.ru/boticordapi.png"  alt="boticord.js"/></a>
 <p>
@@ -8,7 +8,7 @@
 
 </p>
 
-</center>
+</div>
 
 # BotiCordJava
 An API wrapper for https://boticord.top/ written in Java by @megoRU
@@ -29,7 +29,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 	<groupId>com.github.megoRU</groupId>
 	<artifactId>boticordjava</artifactId>
-	<version>e5e609fae4</version>
+	<version>e1c0327661</version>
 </dependency>
 
 ```
