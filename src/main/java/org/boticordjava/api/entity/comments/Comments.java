@@ -11,9 +11,10 @@ public class Comments extends CommentsAbstract {
     @Override
     public String toString() {
         return "userId: " + userId +
-                " text: " + text +
-                " vote: " + vote +
-                " isUpdated: " + isUpdated +
-                " createdAt: " + createdAt;
+                "\ntext: " + text +
+                "\nvote: " + vote +
+                "\nisUpdated: " + isUpdated +
+                "\ncreatedAt: " + createdAt +
+                "\n";
     }
 }

@@ -39,13 +39,12 @@ public class ServerInfo {
 
     @Override
     public String toString() {
-        return "ServerInfo{" +
-                "id='" + id + '\'' +
-                ", shortCode='" + shortCode + '\'' +
-                ", status='" + status + '\'' +
-                ", links=" + links +
-                ", bot=" + bot.toString() +
-                ", information=" + information.toString() +
-                '}';
+        return "id: " + id +
+                "\nshortCode: " + shortCode +
+                "\nstatus: " + status +
+                "\nlinks: " + links +
+                "\nbot: " + bot.toString() +
+                "\ninformation: " + information.toString() +
+                "\n";
     }
 }

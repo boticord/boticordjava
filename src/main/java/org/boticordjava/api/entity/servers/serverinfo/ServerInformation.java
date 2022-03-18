@@ -61,17 +61,17 @@ public class ServerInformation {
 
     @Override
     public String toString() {
-        return "ServerInformation{" +
-                "name='" + name + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", members=" + Arrays.toString(members) +
-                ", owner='" + owner + '\'' +
-                ", bumps='" + bumps + '\'' +
-                ", tags=" + tags +
-                ", links=" + links +
-                ", shortDescription='" + shortDescription + '\'' +
-                ", longDescription='" + longDescription + '\'' +
-                ", badge=" + badge +
-                '}';
+        return "ServerInformation: " +
+                "\nname: " + name +
+                "\navatar: " + avatar +
+                "\nmembers: " + Arrays.toString(members) +
+                "\nowner: " + owner +
+                "\nbumps: " + bumps +
+                "\ntags: " + tags +
+                "\nlinks: " + links +
+                "\nshortDescription: " + shortDescription +
+                "\nlongDescription: " + longDescription +
+                "\nbadge: " + badge +
+                "\n";
     }
 }

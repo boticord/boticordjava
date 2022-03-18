@@ -74,20 +74,20 @@ public class BotInformation {
 
     @Override
     public String toString() {
-        return "Information{" +
-                "bumps=" + bumps +
-                ", added=" + added +
-                ", prefix='" + prefix + '\'' +
-                ", permissions=" + permissions +
-                ", tags=" + tags +
-                ", developers=" + developers +
-                ", links=" + links +
-                ", library='" + library + '\'' +
-                ", shortDescription='" + shortDescription + '\'' +
-                ", longDescription='" + longDescription + '\'' +
-                ", badge=" + badge +
-                ", stats=" + stats +
-                ", status='" + status + '\'' +
-                '}';
+        return "" +
+                "bumps: " + bumps +
+                "\nadded: " + added +
+                "\nprefix: " + prefix +
+                "\npermissions: " + permissions +
+                "\ntags: " + tags +
+                "\ndevelopers: " + developers +
+                "\nlinks: " + links +
+                "\nlibrary: " + library +
+                "\nshortDescription: " + shortDescription +
+                "\nlongDescription: " + longDescription +
+                "\nbadge: " + badge +
+                "\nstats: " + stats +
+                "\nstatus: " + status +
+                "\n";
     }
 }

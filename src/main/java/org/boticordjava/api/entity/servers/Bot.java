@@ -15,9 +15,9 @@ public class Bot {
 
     @Override
     public String toString() {
-        return "Bot{" +
-                "id='" + id + '\'' +
-                ", approved=" + approved +
-                '}';
+        return "Bot: " +
+                "\nid: " + id +
+                "\napproved: " + approved +
+                "\n";
     }
 }

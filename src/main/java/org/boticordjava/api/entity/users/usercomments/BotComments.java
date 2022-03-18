@@ -14,12 +14,11 @@ public class BotComments extends CommentsAbstract {
 
     @Override
     public String toString() {
-        return "BotComments{" +
-                "text='" + text + '\'' +
-                ", vote=" + vote +
-                ", isUpdated=" + isUpdated +
-                ", createdAt='" + createdAt + '\'' +
-                ", botId='" + botId + '\'' +
-                '}';
+        return "text: " + text +
+                "\nvote: " + vote +
+                "\nisUpdated: " + isUpdated +
+                "\ncreatedAt: " + createdAt +
+                "\nbotId: " + botId +
+                "\n";
     }
 }

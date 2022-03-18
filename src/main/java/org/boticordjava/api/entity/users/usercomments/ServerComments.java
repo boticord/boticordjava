@@ -15,9 +15,10 @@ public class ServerComments extends CommentsAbstract {
     @Override
     public String toString() {
         return "serverId: " + serverId +
-                " text: " + text +
-                " vote: " + vote +
-                " isUpdated: " + isUpdated +
-                " createdAt: " + createdAt;
+                "\ntext: " + text +
+                "\nvote: " + vote +
+                "\nisUpdated: " + isUpdated +
+                "\ncreatedAt: " + createdAt +
+                "\n";
     }
 }
