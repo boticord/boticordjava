@@ -12,6 +12,7 @@ import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.comments.Comments;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.users.botslist.DeveloperBots;
+import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercomments.UserComments;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
@@ -158,6 +159,16 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .build();
 
         return get(url, new DefaultResponseTransformer<>(UserComments.class, gson));
+    }
+
+    @Override
+    public UserProfile getUserProfile(String userId) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("profile")
+                .addPathSegment(userId)
+                .build();
+
+        return get(url, new DefaultResponseTransformer<>(UserProfile.class, gson));
     }
 
     private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {

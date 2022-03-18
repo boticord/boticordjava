@@ -7,6 +7,7 @@ import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.comments.Comments;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.users.botslist.DeveloperBots;
+import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercomments.UserComments;
 import org.boticordjava.api.impl.BotiCordAPIImpl;
 import org.jetbrains.annotations.NotNull;
@@ -95,6 +96,12 @@ public interface BotiCordAPI {
      * @return {@link UserComments}
      */
     UserComments getUserComments(String userId);
+
+    /**
+     * @param userId String userId
+     * @return {@link UserProfile}
+     */
+    UserProfile getUserProfile(String userId);
 
     class Builder {
 
