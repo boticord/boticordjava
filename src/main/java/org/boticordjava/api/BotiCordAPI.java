@@ -6,6 +6,8 @@ import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.comments.Comments;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
+import org.boticordjava.api.entity.users.botslist.DeveloperBots;
+import org.boticordjava.api.entity.users.usercomments.UserComments;
 import org.boticordjava.api.impl.BotiCordAPIImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,6 +83,18 @@ public interface BotiCordAPI {
      * @return {@link ResultServer}
      */
     ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID);
+
+    /**
+     * @param userId String userId
+     * @return {@link DeveloperBots}
+     */
+    DeveloperBots[] getDeveloperBots(String userId);
+
+    /**
+     * @param userId String userId
+     * @return {@link UserComments}
+     */
+    UserComments getUserComments(String userId);
 
     class Builder {
 

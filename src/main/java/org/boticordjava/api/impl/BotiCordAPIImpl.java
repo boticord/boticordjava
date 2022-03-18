@@ -11,6 +11,8 @@ import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.comments.Comments;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
+import org.boticordjava.api.entity.users.botslist.DeveloperBots;
+import org.boticordjava.api.entity.users.usercomments.UserComments;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
@@ -42,6 +44,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
+    @Override
     public Result setStats(int servers, int shards, int users) {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("stats")
@@ -55,6 +58,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
     }
 
+    @Override
     public BotStats getBot(@NotNull String botId) {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bot")
@@ -64,6 +68,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return get(url, new DefaultResponseTransformer<>(BotStats.class, gson));
     }
 
+    @Override
     public Comments[] getBotComments() {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bot")
@@ -104,6 +109,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
     }
 
+    @Override
     public ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("server")
@@ -116,7 +122,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         json.put("status", status);
 
         if (serverName != null)
-            json.put("", "");
+            json.put("serverName", serverName);
 
         if (serverAvatar != null)
             json.put("serverAvatar", serverAvatar);
@@ -133,6 +139,26 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return post(url, json, new DefaultResponseTransformer<>(ResultServer.class, gson));
     }
 
+    @Override
+    public DeveloperBots[] getDeveloperBots(String userId) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("bots")
+                .addPathSegment(userId)
+                .build();
+
+        return get(url, new DefaultResponseTransformer<>(DeveloperBots[].class, gson));
+    }
+
+    @Override
+    public UserComments getUserComments(String userId) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("profile")
+                .addPathSegment(userId)
+                .addPathSegment("comments")
+                .build();
+
+        return get(url, new DefaultResponseTransformer<>(UserComments.class, gson));
+    }
 
     private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {
         HttpClient client = HttpClient.newHttpClient();
