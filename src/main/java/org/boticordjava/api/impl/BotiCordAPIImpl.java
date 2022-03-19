@@ -15,6 +15,7 @@ import org.boticordjava.api.entity.users.botslist.DeveloperBots;
 import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercomments.UserComments;
 import org.boticordjava.api.io.DefaultResponseTransformer;
+import org.boticordjava.api.io.NullResponseException;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
@@ -198,6 +199,10 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         HttpResponse<String> response = null;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response == null) {
+                throw new NullResponseException();
+            }
 
             if (response.statusCode() == 401 || response.statusCode() == 404 || response.statusCode() == 403) {
                 ErrorResponse result = gson.fromJson(response.body(), ErrorResponse.class);
