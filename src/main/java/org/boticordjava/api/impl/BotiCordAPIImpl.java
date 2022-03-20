@@ -20,6 +20,7 @@ import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
@@ -52,10 +53,15 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment("stats")
                 .build();
 
-        JSONObject json = new JSONObject()
-                .put("servers", servers)
-                .put("shards", shards)
-                .put("users", users);
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("servers", servers);
+            json.put("shards", shards);
+            json.put("users", users);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
     }
@@ -77,8 +83,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment(this.botId)
                 .addPathSegment("comments")
                 .build();
-
-        System.out.println(url);
 
         return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
     }
@@ -119,24 +123,30 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
         JSONObject json = new JSONObject();
 
-        json.put("serverID", serverId);
-        json.put("up", up);
-        json.put("status", status);
+        try {
 
-        if (serverName != null)
-            json.put("serverName", serverName);
+            json.put("serverID", serverId);
+            json.put("up", up);
+            json.put("status", status);
 
-        if (serverAvatar != null)
-            json.put("serverAvatar", serverAvatar);
+            if (serverName != null)
+                json.put("serverName", serverName);
 
-        if (serverMembersAllCount != null)
-            json.put("serverMembersAllCount", serverMembersAllCount);
+            if (serverAvatar != null)
+                json.put("serverAvatar", serverAvatar);
 
-        if (serverMembersOnlineCount != null)
-            json.put("serverMembersOnlineCount", serverMembersOnlineCount);
+            if (serverMembersAllCount != null)
+                json.put("serverMembersAllCount", serverMembersAllCount);
 
-        if (serverOwnerID != null)
-            json.put("serverOwnerID", serverOwnerID);
+            if (serverMembersOnlineCount != null)
+                json.put("serverMembersOnlineCount", serverMembersOnlineCount);
+
+            if (serverOwnerID != null)
+                json.put("serverOwnerID", serverOwnerID);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return post(url, json, new DefaultResponseTransformer<>(ResultServer.class, gson));
     }
