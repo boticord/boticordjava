@@ -27,7 +27,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 	<groupId>com.github.megoRU</groupId>
 	<artifactId>boticordjava</artifactId>
-	<version>v2.6</version>
+	<version>v2.8</version>
 </dependency>
 
 ```
@@ -64,7 +64,14 @@ public static void main(String[] args) {
 }    
 ```
 
+## Dependencies
+
+1. [Gson](https://github.com/google/gson)
+2. [Apache HttpClient](https://github.com/apache/httpcomponents-client)
+3. [JSON-java](https://github.com/stleary/JSON-java)
+4. [okhttp](https://github.com/square/okhttp)
+
 ## Links
 
-* [BotiCord](https://boticord.top/)
+* [BotiCord](https://boticord.top)
 * [Support](https://boticord.top/discord)

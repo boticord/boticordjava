@@ -1,6 +1,6 @@
-package org.boticordjava.api.entity.bot.botinfo;
+package org.boticordjava.api.entity.abstracts;
 
-public class Server {
+public abstract class AbstractInfo {
 
     private String id;
     private boolean approved;

@@ -2,13 +2,22 @@ package org.boticordjava.api.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import okhttp3.HttpUrl;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.boticordjava.api.BotiCordAPI;
 import org.boticordjava.api.entity.ErrorResponse;
 import org.boticordjava.api.entity.Result;
 import org.boticordjava.api.entity.ResultServer;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
-import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.comments.Comments;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.users.botslist.DeveloperBots;
@@ -22,11 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import okhttp3.HttpUrl;
 
 public class BotiCordAPIImpl implements BotiCordAPI {
 
@@ -37,7 +42,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
             .build();
 
     private final Gson gson;
-
+    private final CloseableHttpClient httpClient = HttpClients.createDefault();
     private final String token, botId;
 
     public BotiCordAPIImpl(String token, String botId) {
@@ -64,16 +69,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         }
 
         return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
-    }
-
-    @Override
-    public BotStats getBot(@NotNull String botId) {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("bot")
-                .addPathSegment(botId)
-                .build();
-
-        return get(url, new DefaultResponseTransformer<>(BotStats.class, gson));
     }
 
     @Override
@@ -183,44 +178,50 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(url.url().toString()))
-                .GET()
-                .header("Content-Type", "application/json")
-                .header("Authorization", this.token)
-                .build();
+        HttpGet request = new HttpGet(url.uri());
+        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        request.addHeader(HttpHeaders.AUTHORIZATION, this.token);
 
-        return execute(client, req, responseTransformer);
+        return execute(request, responseTransformer);
     }
 
     private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer) {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(url.url().toString()))
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody.toString()))
-                .header("Content-Type", "application/json")
-                .header("Authorization", this.token)
-                .build();
-        return execute(client, req, responseTransformer);
+        HttpPost request = new HttpPost(url.uri());
+        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        request.addHeader(HttpHeaders.AUTHORIZATION, this.token);
+        HttpEntity stringEntity = new StringEntity(jsonBody.toString(), ContentType.APPLICATION_JSON);
+        request.setEntity(stringEntity);
+        return execute(request, responseTransformer);
     }
 
-    private <E> E execute(HttpClient client, HttpRequest request, ResponseTransformer<E> responseTransformer) {
-        HttpResponse<String> response = null;
+    private <E> E execute(HttpRequestBase request, ResponseTransformer<E> responseTransformer) {
+        HttpEntity entity;
+        String body = null;
         try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            CloseableHttpResponse response = httpClient.execute(request);
 
-            if (response == null) {
+            // Get HttpResponse Status
+            System.out.println("Status: " + response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase());
+
+            entity = response.getEntity();
+
+            if (entity == null) {
                 throw new NullResponseException();
             }
 
-            if (response.statusCode() == 401 || response.statusCode() == 404 || response.statusCode() == 403) {
-                ErrorResponse result = gson.fromJson(response.body(), ErrorResponse.class);
+            body = EntityUtils.toString(entity);
+
+            System.out.println(body);
+            if (response.getStatusLine().getStatusCode() == 401
+                    || response.getStatusLine().getStatusCode() == 404
+                    || response.getStatusLine().getStatusCode() == 403) {
+                ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                 throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return responseTransformer.transform(response);
+        return responseTransformer.transform(body);
     }
 }

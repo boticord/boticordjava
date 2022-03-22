@@ -1,5 +1,8 @@
 package org.boticordjava.api.entity.bot.botinfo;
 
+import org.boticordjava.api.entity.abstracts.Info;
+import org.boticordjava.api.entity.abstracts.AbstractInfo;
+
 import java.util.List;
 
 public class BotInfo {
@@ -7,7 +10,7 @@ public class BotInfo {
     private String id;
     private String shortCode;
     private List<String> links;
-    private Server server;
+    private Info server;
     private BotInformation information;
 
     public String getId() {
@@ -22,7 +25,7 @@ public class BotInfo {
         return links;
     }
 
-    public Server getServer() {
+    public AbstractInfo getServer() {
         return server;
     }
 

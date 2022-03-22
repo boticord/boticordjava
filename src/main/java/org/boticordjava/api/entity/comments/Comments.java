@@ -1,7 +1,7 @@
 package org.boticordjava.api.entity.comments;
 
 import com.google.gson.annotations.SerializedName;
-import org.boticordjava.api.entity.CommentsAbstract;
+import org.boticordjava.api.entity.abstracts.CommentsAbstract;
 
 public class Comments extends CommentsAbstract {
 

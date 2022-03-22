@@ -26,11 +26,11 @@ public interface BotiCordAPI {
      */
     Result setStats(int servers, int shards, int users);
 
-    /**
-     * @param botId String botId or shortCode
-     * @return {@link BotStats}
-     */
-    BotStats getBot(@NotNull String botId);
+//    /**
+//     * @param botId String botId or shortCode
+//     * @return {@link BotStats}
+//     */
+//    BotStats getBot(@NotNull String botId);
 
     /**
      * Example:
