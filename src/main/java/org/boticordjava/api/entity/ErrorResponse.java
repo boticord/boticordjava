@@ -2,7 +2,7 @@ package org.boticordjava.api.entity;
 
 public class ErrorResponse {
 
-    Errors error;
+    public Errors error;
 
     public ErrorResponse(Errors error) {
         this.error = error;

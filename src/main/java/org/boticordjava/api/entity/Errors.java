@@ -2,8 +2,8 @@ package org.boticordjava.api.entity;
 
 public class Errors {
 
-    Integer code;
-    String message;
+    private Integer code;
+    private String message;
 
     public Integer getCode() {
         return code;

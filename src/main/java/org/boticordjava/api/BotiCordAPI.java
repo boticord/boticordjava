@@ -1,10 +1,12 @@
 package org.boticordjava.api;
 
+import org.boticordjava.api.entity.Domain;
 import org.boticordjava.api.entity.Result;
 import org.boticordjava.api.entity.ResultServer;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.comments.Comments;
+import org.boticordjava.api.entity.links.GetShortLink;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.users.botslist.DeveloperBots;
 import org.boticordjava.api.entity.users.profile.UserProfile;
@@ -67,6 +69,57 @@ public interface BotiCordAPI {
      */
     Comments[] getServerComments(@NotNull String serverId);
 
+    /**
+     * @param code String code. The link code, if specified, then information about links with such a code is searched
+     *             <p>
+     *             Example:
+     *             <p> GetShortLink[] userLinks = api.GetShortLink(code);
+     *             <p> for (int i = 0; i < userLinks.length; i++) {
+     *             <p>   System.out.println(userLinks[i].getLink());
+     *             <p> }
+     * @return {@link GetShortLink}
+     */
+    GetShortLink[] getUserLinks(@NotNull String code);
+
+    /**
+     * <p>
+     * Example:
+     * <p> GetShortLink[] userLinks = api.GetShortLink();
+     * <p> for (int i = 0; i < userLinks.length; i++) {
+     * <p>   System.out.println(userLinks[i].getLink());
+     * <p> }
+     *
+     * @return {@link GetShortLink}
+     */
+    GetShortLink[] getUserLinks();
+
+    /**
+     * @param code   The link code to use
+     * @param link   The link that needs to be shortened
+     * @param domain The domain for shortening the link. By default, it costs 1 (bcord.cc ), values of 2 are possible (myservers.me ) and 3 (discord.camp)
+     * @return {@link GetShortLink}
+     */
+    GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain);
+
+    /**
+     * @param code The link code to use
+     * @param link The link that needs to be shortened
+     * @return {@link GetShortLink}
+     */
+    GetShortLink createShortLink(@NotNull String code, @NotNull String link);
+
+    /**
+     * @param code The link code to use
+     * @return {@link Result}
+     */
+    Result deleteShortLink(@NotNull String code);
+
+    /**
+     * @param code   The link code to use
+     * @param domain The domain of the abbreviated link. Possible values: 1 (bcord.cc ), 2 (myservers.me ) and 3 (discord.camp)
+     * @return {@link Result}
+     */
+    Result deleteShortLink(@NotNull String code, @NotNull Domain domain);
 
     /**
      * @param serverId                 String serverID serverId

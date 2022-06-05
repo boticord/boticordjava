@@ -14,11 +14,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.boticordjava.api.BotiCordAPI;
-import org.boticordjava.api.entity.ErrorResponse;
-import org.boticordjava.api.entity.Result;
-import org.boticordjava.api.entity.ResultServer;
+import org.boticordjava.api.entity.*;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.comments.Comments;
+import org.boticordjava.api.entity.links.GetShortLink;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.users.botslist.DeveloperBots;
 import org.boticordjava.api.entity.users.profile.UserProfile;
@@ -108,6 +107,91 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment("comments")
                 .build();
         return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
+    }
+
+    @Override
+    public GetShortLink[] getUserLinks(@NotNull String code) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("links")
+                .addPathSegment("get")
+                .build();
+
+        JSONObject json = new JSONObject();
+
+        json.put("code", code);
+
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson));
+    }
+
+    @Override
+    public GetShortLink[] getUserLinks() {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("links")
+                .addPathSegment("get")
+                .build();
+        JSONObject json = new JSONObject();
+
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson));
+    }
+
+    @Override
+    public GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("links")
+                .addPathSegment("create")
+                .build();
+
+        JSONObject json = new JSONObject();
+
+        json.put("code", code);
+        json.put("link", link);
+        json.put("domain", domain.get());
+
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson));
+    }
+
+    @Override
+    public GetShortLink createShortLink(@NotNull String code, @NotNull String link) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("links")
+                .addPathSegment("create")
+                .build();
+
+        JSONObject json = new JSONObject();
+
+        json.put("code", code);
+        json.put("link", link);
+        json.put("domain", 1);
+
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson));
+    }
+
+    @Override
+    public Result deleteShortLink(@NotNull String code) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("links")
+                .addPathSegment("delete")
+                .build();
+
+        JSONObject json = new JSONObject();
+        json.put("code", code);
+
+        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
+    }
+
+    @Override
+    public Result deleteShortLink(@NotNull String code, @NotNull Domain domain) {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("links")
+                .addPathSegment("delete")
+                .build();
+
+        JSONObject json = new JSONObject();
+
+        json.put("code", code);
+        json.put("domain", domain.get());
+
+        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
     }
 
     @Override
@@ -212,12 +296,17 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
             body = EntityUtils.toString(entity);
 
-            System.out.println(body);
+//            System.out.println(body);
             if (response.getStatusLine().getStatusCode() == 401
                     || response.getStatusLine().getStatusCode() == 404
-                    || response.getStatusLine().getStatusCode() == 403) {
+                    || response.getStatusLine().getStatusCode() == 403
+                    || response.getStatusLine().getStatusCode() == 400) {
                 ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                 throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+            }
+            if (response.getStatusLine().getStatusCode() == 429) {
+                ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
+                throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
