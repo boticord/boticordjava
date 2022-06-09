@@ -2,6 +2,7 @@ package org.boticordjava.api.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import okhttp3.HttpUrl;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -13,7 +14,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.boticordjava.api.BotiCordAPI;
+import org.boticordjava.api.TokenEnum;
 import org.boticordjava.api.entity.*;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.comments.Comments;
@@ -30,23 +31,40 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
-import okhttp3.HttpUrl;
 
 public class BotiCordAPIImpl implements BotiCordAPI {
 
-    private static final HttpUrl baseUrl = new HttpUrl.Builder()
-            .scheme("https")
-            .host("api.boticord.top")
-            .addPathSegment("v1")
-            .build();
+    private final HttpUrl baseUrl;
 
     private final Gson gson;
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
     private final String token, botId;
+    private final TokenEnum tokenEnum;
 
-    public BotiCordAPIImpl(String token, String botId) {
+    protected BotiCordAPIImpl(String token, String botId) {
         this.token = token;
         this.botId = botId;
+        this.tokenEnum = null;
+
+        baseUrl = new HttpUrl.Builder()
+                .scheme("https")
+                .host("api.boticord.top")
+                .addPathSegment("v1")
+                .build();
+
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
+    }
+
+    protected BotiCordAPIImpl(String token, String botId, TokenEnum tokenEnum) {
+        this.token = token;
+        this.botId = botId;
+        this.tokenEnum = tokenEnum;
+
+        baseUrl = new HttpUrl.Builder()
+                .scheme("https")
+                .host("api.boticord.top")
+                .addPathSegment("v2")
+                .build();
 
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
@@ -264,15 +282,21 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {
         HttpGet request = new HttpGet(url.uri());
         request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        request.addHeader(HttpHeaders.AUTHORIZATION, this.token);
+        request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
 
         return execute(request, responseTransformer);
+    }
+
+    private String tokenHandler() {
+        if (tokenEnum != null) return tokenEnum.get() + this.token;
+        return this.token;
     }
 
     private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer) {
         HttpPost request = new HttpPost(url.uri());
         request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        request.addHeader(HttpHeaders.AUTHORIZATION, this.token);
+        request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
+
         HttpEntity stringEntity = new StringEntity(jsonBody.toString(), ContentType.APPLICATION_JSON);
         request.setEntity(stringEntity);
         return execute(request, responseTransformer);
@@ -285,8 +309,8 @@ public class BotiCordAPIImpl implements BotiCordAPI {
             CloseableHttpResponse response = httpClient.execute(request);
 
             // Get HttpResponse Status
-            System.out.println("Status: " + response.getStatusLine().getStatusCode() + " "
-                    + response.getStatusLine().getReasonPhrase());
+//            System.out.println("Status: " + response.getStatusLine().getStatusCode() + " "
+//                    + response.getStatusLine().getReasonPhrase());
 
             entity = response.getEntity();
 

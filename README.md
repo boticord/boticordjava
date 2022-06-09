@@ -27,7 +27,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 	<groupId>com.github.megoRU</groupId>
 	<artifactId>boticordjava</artifactId>
-	<version>v3.0</version>
+	<version>v3.1</version>
 </dependency>
 
 ```
@@ -39,7 +39,11 @@ https://jitpack.io/#megoRU/boticordjava
 ```java
 public static void main(String[] args) {
 
-    BotiCordAPI api = new BotiCordAPIImpl("YOUR_TOKEN", "BOT_ID");
+    BotiCordAPI api = new BotiCordAPI.Builder()
+        .token("YOUR_TOKEN")
+        .botId("BOT_ID")
+        .build();
+    
     Comments[] comments = api.getBotComments();
 
     for (int i = 0; i < comments.length; i++) {
@@ -54,13 +58,31 @@ public static void main(String[] args) {
 ```java
 public static void main(String[] args) {
 
-    BotiCordAPI api = new BotiCordAPIImpl("YOUR_TOKEN", "BOT_ID");
-
+    BotiCordAPI api = new BotiCordAPI.Builder()
+        .token("YOUR_TOKEN")
+        .botId("BOT_ID")
+        .build();
+    
     int servers = ...; // the server count
     int shards = ...; // shards count
     int users = ...; // the amount of users
 
     api.setStats(servers, shards, users);
+}    
+```
+
+### How to use API v2
+
+```java
+public static void main(String[] args) {
+
+    BotiCordAPI api = new BotiCordAPI.Builder()
+        .botId("BOT_ID")
+        .token("YOUR_TOKEN")
+        .tokenEnum(TokenEnum.PROFILE) //This enable API v2
+        .build();
+    
+    api.createShortLink("boticordjava", "https://docs.boticord.top/libraries/boticordjava");
 }    
 ```
 

@@ -1,5 +1,6 @@
-package org.boticordjava.api;
+package org.boticordjava.api.impl;
 
+import org.boticordjava.api.TokenEnum;
 import org.boticordjava.api.entity.Domain;
 import org.boticordjava.api.entity.Result;
 import org.boticordjava.api.entity.ResultServer;
@@ -11,7 +12,6 @@ import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.users.botslist.DeveloperBots;
 import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercomments.UserComments;
-import org.boticordjava.api.impl.BotiCordAPIImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -161,14 +161,33 @@ public interface BotiCordAPI {
         // Required
         private String botId = null;
         private String token = null;
+        private TokenEnum tokenEnum;
 
+        /**
+         * @param token Bot token, server token, or user token
+         */
         public Builder token(String token) {
             this.token = token;
             return this;
         }
 
+        /**
+         * @param botId Maybe the ID of the server or bot
+         */
         public Builder botId(String botId) {
             this.botId = botId;
+            return this;
+        }
+
+        /**
+         * This method enable v2 API
+         *
+         * @param tokenEnum:<br> {@link TokenEnum#BOT}: API-токен бота. Используется чаще всего. <br>
+         *                       {@link TokenEnum#PRIVATE_BOT}: API-токен бота. Используется в приватных случаях (например: Ап сервера, если у вас не сервисный бот)<br>
+         *                       {@link TokenEnum#PROFILE}: API-токен пользователя. Используется в Методах Сокращения Ссылок.<br>
+         */
+        public Builder tokenEnum(TokenEnum tokenEnum) {
+            this.tokenEnum = tokenEnum;
             return this;
         }
 
@@ -181,6 +200,9 @@ public interface BotiCordAPI {
 
             if (botId == null)
                 throw new IllegalArgumentException("The provided bot ID cannot be null!");
+
+            if (tokenEnum != null)
+                return new BotiCordAPIImpl(token, botId, tokenEnum);
 
             return new BotiCordAPIImpl(token, botId);
         }
