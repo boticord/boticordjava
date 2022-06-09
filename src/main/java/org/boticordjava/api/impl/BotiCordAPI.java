@@ -180,11 +180,11 @@ public interface BotiCordAPI {
         }
 
         /**
-         * This method enable v2 API
+         * This method enable API v2
          *
-         * @param tokenEnum:<br> {@link TokenEnum#BOT}: API-токен бота. Используется чаще всего. <br>
-         *                       {@link TokenEnum#PRIVATE_BOT}: API-токен бота. Используется в приватных случаях (например: Ап сервера, если у вас не сервисный бот)<br>
-         *                       {@link TokenEnum#PROFILE}: API-токен пользователя. Используется в Методах Сокращения Ссылок.<br>
+         * @param tokenEnum:<br> {@link TokenEnum#BOT}: API-token bot. Used most often. <br>
+         *                       {@link TokenEnum#PRIVATE_BOT}: API-token bot. Used in private cases (for example: Ap server, if you do not have a service bot)<br>
+         *                       {@link TokenEnum#PROFILE}: API-token user. Used to shorten links.<br>
          */
         public Builder tokenEnum(TokenEnum tokenEnum) {
             this.tokenEnum = tokenEnum;
