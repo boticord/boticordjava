@@ -75,7 +75,6 @@ public static void main(String[] args) {
 public static void main(String[] args) {
 
     BotiCordAPI api = new BotiCordAPI.Builder()
-        .botId("BOT_ID")
         .token("YOUR_TOKEN")
         .tokenEnum(TokenEnum.PROFILE) //This enable API v2
         .build();
