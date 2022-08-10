@@ -1,7 +1,6 @@
-package org.boticordjava.api.entity;
+package org.boticordjava.api.entity.Enums;
 
 public enum Domain {
-
 
     ONE("bcord.cc"),
     TWO("myservers.me"),

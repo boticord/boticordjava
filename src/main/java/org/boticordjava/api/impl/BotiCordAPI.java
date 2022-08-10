@@ -1,7 +1,7 @@
 package org.boticordjava.api.impl;
 
-import org.boticordjava.api.TokenEnum;
-import org.boticordjava.api.entity.Domain;
+import org.boticordjava.api.entity.Enums.TokenEnum;
+import org.boticordjava.api.entity.Enums.Domain;
 import org.boticordjava.api.entity.Result;
 import org.boticordjava.api.entity.ResultServer;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
@@ -41,9 +41,10 @@ public interface BotiCordAPI {
      * <p>   System.out.println(comments[i].getUserId());
      * <p> }
      *
+     * @param botId String botId or shortCode
      * @return {@link Comments}
      */
-    Comments[] getBotComments();
+    Comments[] getBotComments(@NotNull String botId);
 
     /**
      * @param botId String botId or shortCode
@@ -159,7 +160,6 @@ public interface BotiCordAPI {
     class Builder {
 
         // Required
-        private String botId = null;
         private String token = null;
         private TokenEnum tokenEnum;
 
@@ -172,19 +172,12 @@ public interface BotiCordAPI {
         }
 
         /**
-         * @param botId Maybe the ID of the server or bot
-         */
-        public Builder botId(String botId) {
-            this.botId = botId;
-            return this;
-        }
-
-        /**
          * This method enable API v2
          *
          * @param tokenEnum:<br> {@link TokenEnum#BOT}: API-token bot. Used most often. <br>
          *                       {@link TokenEnum#PRIVATE_BOT}: API-token bot. Used in private cases (for example: Ap server, if you do not have a service bot)<br>
          *                       {@link TokenEnum#PROFILE}: API-token user. Used to shorten links.<br>
+         *                       {@link TokenEnum#NONE}: None token. Used for get Bot/Server/User info.<br>
          */
         public Builder tokenEnum(TokenEnum tokenEnum) {
             this.tokenEnum = tokenEnum;
@@ -195,16 +188,15 @@ public interface BotiCordAPI {
          * @throws IllegalArgumentException if token or botId null
          */
         public BotiCordAPI build() {
-            if (token == null)
+            if (tokenEnum != TokenEnum.NONE && token == null)
                 throw new IllegalArgumentException("The provided token cannot be null!");
 
-            if (botId == null)
-                throw new IllegalArgumentException("The provided bot ID cannot be null!");
-
             if (tokenEnum != null)
-                return new BotiCordAPIImpl(token, botId, tokenEnum);
+                return new BotiCordAPIImpl(token, tokenEnum);
 
-            return new BotiCordAPIImpl(token, botId);
+
+            System.out.println(token);
+            return new BotiCordAPIImpl(token);
         }
 
     }

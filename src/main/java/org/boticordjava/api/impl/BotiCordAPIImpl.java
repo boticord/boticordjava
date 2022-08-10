@@ -14,8 +14,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.boticordjava.api.TokenEnum;
-import org.boticordjava.api.entity.*;
+import org.boticordjava.api.BoticordUtils;
+import org.boticordjava.api.entity.Enums.Domain;
+import org.boticordjava.api.entity.Enums.Endpoints;
+import org.boticordjava.api.entity.Enums.TokenEnum;
+import org.boticordjava.api.entity.ErrorResponse;
+import org.boticordjava.api.entity.ErrorResponseToMany;
+import org.boticordjava.api.entity.Result;
+import org.boticordjava.api.entity.ResultServer;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.comments.Comments;
 import org.boticordjava.api.entity.links.GetShortLink;
@@ -38,13 +44,14 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
     private final Gson gson;
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
-    private final String token, botId;
+    private final String token;
     private final TokenEnum tokenEnum;
+    private final int version;
 
-    protected BotiCordAPIImpl(String token, String botId) {
+    protected BotiCordAPIImpl(String token) {
         this.token = token;
-        this.botId = botId;
         this.tokenEnum = null;
+        this.version = 1;
 
         baseUrl = new HttpUrl.Builder()
                 .scheme("https")
@@ -55,10 +62,10 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    protected BotiCordAPIImpl(String token, String botId, TokenEnum tokenEnum) {
+    protected BotiCordAPIImpl(String token, TokenEnum tokenEnum) {
         this.token = token;
-        this.botId = botId;
         this.tokenEnum = tokenEnum;
+        this.version = 2;
 
         baseUrl = new HttpUrl.Builder()
                 .scheme("https")
@@ -67,6 +74,12 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .build();
 
         this.gson = new GsonBuilder().setPrettyPrinting().create();
+    }
+
+    private void checks(Endpoints endpoint) {
+        boolean result = BoticordUtils.CanSendRequestToEndpoint(endpoint, this.tokenEnum);
+        if (version == 2 && !result)
+            throw new IllegalArgumentException("TokenEnum." + tokenEnum + " is wrong for this: " + endpoint);
     }
 
     @Override
@@ -85,18 +98,18 @@ public class BotiCordAPIImpl implements BotiCordAPI {
             e.printStackTrace();
         }
 
-        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson), Endpoints.POST_BOT_STATS);
     }
 
     @Override
-    public Comments[] getBotComments() {
+    public Comments[] getBotComments(@NotNull String botId) {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bot")
-                .addPathSegment(this.botId)
+                .addPathSegment(botId)
                 .addPathSegment("comments")
                 .build();
 
-        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
+        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson), Endpoints.GET_BOT_COMMENTS);
     }
 
     @Override
@@ -105,7 +118,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment("bot")
                 .addPathSegment(botId)
                 .build();
-        return get(url, new DefaultResponseTransformer<>(BotInfo.class, gson));
+        return get(url, new DefaultResponseTransformer<>(BotInfo.class, gson), Endpoints.GET_BOT_INFO);
     }
 
     @Override
@@ -114,7 +127,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment("server")
                 .addPathSegment(botId)
                 .build();
-        return get(url, new DefaultResponseTransformer<>(ServerInfo.class, gson));
+        return get(url, new DefaultResponseTransformer<>(ServerInfo.class, gson), Endpoints.GET_SERVER_INFO);
     }
 
     @Override
@@ -124,7 +137,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment(serverId)
                 .addPathSegment("comments")
                 .build();
-        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
+        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson), Endpoints.GET_SERVER_COMMENTS);
     }
 
     @Override
@@ -138,7 +151,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
         json.put("code", code);
 
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson), Endpoints.POST_LINKS_GET);
     }
 
     @Override
@@ -149,7 +162,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .build();
         JSONObject json = new JSONObject();
 
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson), Endpoints.POST_LINKS_GET);
     }
 
     @Override
@@ -165,7 +178,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         json.put("link", link);
         json.put("domain", domain.get());
 
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson), Endpoints.POST_LINKS_CREATE);
     }
 
     @Override
@@ -181,7 +194,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         json.put("link", link);
         json.put("domain", 1);
 
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson), Endpoints.POST_LINKS_CREATE);
     }
 
     @Override
@@ -194,7 +207,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         JSONObject json = new JSONObject();
         json.put("code", code);
 
-        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson), Endpoints.POST_LINKS_DELETE);
     }
 
     @Override
@@ -209,7 +222,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         json.put("code", code);
         json.put("domain", domain.get());
 
-        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson), Endpoints.POST_LINKS_DELETE);
     }
 
     @Override
@@ -245,9 +258,10 @@ public class BotiCordAPIImpl implements BotiCordAPI {
             e.printStackTrace();
         }
 
-        return post(url, json, new DefaultResponseTransformer<>(ResultServer.class, gson));
+        return post(url, json, new DefaultResponseTransformer<>(ResultServer.class, gson), Endpoints.POST_SERVER_STATS);
     }
 
+    //TODO: разобраться
     @Override
     public DeveloperBots[] getDeveloperBots(String userId) {
         HttpUrl url = baseUrl.newBuilder()
@@ -255,7 +269,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment(userId)
                 .build();
 
-        return get(url, new DefaultResponseTransformer<>(DeveloperBots[].class, gson));
+        return get(url, new DefaultResponseTransformer<>(DeveloperBots[].class, gson), Endpoints.GET_USER_BOTS);
     }
 
     @Override
@@ -266,7 +280,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment("comments")
                 .build();
 
-        return get(url, new DefaultResponseTransformer<>(UserComments.class, gson));
+        return get(url, new DefaultResponseTransformer<>(UserComments.class, gson), Endpoints.GET_USER_COMMENTS);
     }
 
     @Override
@@ -276,15 +290,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 .addPathSegment(userId)
                 .build();
 
-        return get(url, new DefaultResponseTransformer<>(UserProfile.class, gson));
-    }
-
-    private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) {
-        HttpGet request = new HttpGet(url.uri());
-        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
-
-        return execute(request, responseTransformer);
+        return get(url, new DefaultResponseTransformer<>(UserProfile.class, gson), Endpoints.GET_USER_INFO);
     }
 
     private String tokenHandler() {
@@ -292,33 +298,37 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return this.token;
     }
 
-    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer) {
+    private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer, Endpoints endpoints) {
+        HttpGet request = new HttpGet(url.uri());
+        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
+
+        return execute(request, responseTransformer, endpoints);
+    }
+
+    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer, Endpoints endpoints) {
         HttpPost request = new HttpPost(url.uri());
         request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
 
         HttpEntity stringEntity = new StringEntity(jsonBody.toString(), ContentType.APPLICATION_JSON);
         request.setEntity(stringEntity);
-        return execute(request, responseTransformer);
+        return execute(request, responseTransformer, endpoints);
     }
 
-    private <E> E execute(HttpRequestBase request, ResponseTransformer<E> responseTransformer) {
-        HttpEntity entity;
-        String body = null;
+    private <E> E execute(HttpRequestBase request, ResponseTransformer<E> responseTransformer, Endpoints endpoints) {
         try {
+            checks(endpoints);
+
             CloseableHttpResponse response = httpClient.execute(request);
+            HttpEntity entity = response.getEntity();
+            String body = EntityUtils.toString(entity);
 
             // Get HttpResponse Status
 //            System.out.println("Status: " + response.getStatusLine().getStatusCode() + " "
 //                    + response.getStatusLine().getReasonPhrase());
 
-            entity = response.getEntity();
-
-            if (entity == null) {
-                throw new NullResponseException();
-            }
-
-            body = EntityUtils.toString(entity);
+            if (body == null) throw new NullResponseException();
 
 //            System.out.println(body);
             if (response.getStatusLine().getStatusCode() == 401
@@ -332,9 +342,11 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
                 throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
             }
+
+            return responseTransformer.transform(body);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return responseTransformer.transform(body);
+        return null;
     }
 }

@@ -27,7 +27,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 	<groupId>com.github.megoRU</groupId>
 	<artifactId>boticordjava</artifactId>
-	<version>v3.1</version>
+	<version>v3.3</version>
 </dependency>
 
 ```
@@ -41,7 +41,6 @@ public static void main(String[] args) {
 
     BotiCordAPI api = new BotiCordAPI.Builder()
         .token("YOUR_TOKEN")
-        .botId("BOT_ID")
         .build();
     
     Comments[] comments = api.getBotComments();
@@ -60,7 +59,6 @@ public static void main(String[] args) {
 
     BotiCordAPI api = new BotiCordAPI.Builder()
         .token("YOUR_TOKEN")
-        .botId("BOT_ID")
         .build();
     
     int servers = ...; // the server count

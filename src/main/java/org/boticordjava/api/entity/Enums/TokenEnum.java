@@ -1,10 +1,11 @@
-package org.boticordjava.api;
+package org.boticordjava.api.entity.Enums;
 
 public enum TokenEnum {
 
     BOT("Bot "),
     PRIVATE_BOT("PrivateBot "),
-    PROFILE("Profile ");
+    PROFILE("Profile "),
+    NONE("None ");
 
     private final String text;
 
