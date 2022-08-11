@@ -43,7 +43,7 @@ public static void main(String[] args) {
         .token("YOUR_TOKEN")
         .build();
     
-    Comments[] comments = api.getBotComments();
+    Comments[] comments = api.getBotComments("808277484524011531");
 
     for (int i = 0; i < comments.length; i++) {
     System.out.println(comments[i].getText());

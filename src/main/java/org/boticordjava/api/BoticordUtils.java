@@ -25,8 +25,7 @@ public final class BoticordUtils {
             Map.entry(Endpoints.GET_USER_COMMENTS, new TokenEnum[]{TokenEnum.BOT, TokenEnum.PRIVATE_BOT, TokenEnum.PROFILE}),
             Map.entry(Endpoints.GET_USER_BOTS, new TokenEnum[]{TokenEnum.BOT, TokenEnum.PRIVATE_BOT, TokenEnum.PROFILE}));
 
-
-    public static boolean CanSendRequestToEndpoint(Endpoints endpoint, TokenEnum tokenEnum) {
+    public static boolean canSendRequestToEndpoint(Endpoints endpoint, TokenEnum tokenEnum) {
         return Arrays.asList(accessMap.get(endpoint)).contains(tokenEnum);
     }
 }

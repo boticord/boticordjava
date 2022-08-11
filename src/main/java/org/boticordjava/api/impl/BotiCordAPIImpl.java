@@ -77,7 +77,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     private void checks(Endpoints endpoint) {
-        boolean result = BoticordUtils.CanSendRequestToEndpoint(endpoint, this.tokenEnum);
+        boolean result = BoticordUtils.canSendRequestToEndpoint(endpoint, this.tokenEnum);
         if (version == 2 && !result)
             throw new IllegalArgumentException("TokenEnum." + tokenEnum + " is wrong for this: " + endpoint);
     }
