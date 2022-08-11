@@ -194,8 +194,6 @@ public interface BotiCordAPI {
             if (tokenEnum != null)
                 return new BotiCordAPIImpl(token, tokenEnum);
 
-
-            System.out.println(token);
             return new BotiCordAPIImpl(token);
         }
 
