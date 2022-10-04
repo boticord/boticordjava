@@ -319,6 +319,16 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     private <E> E execute(HttpRequestBase request, ResponseTransformer<E> responseTransformer, Endpoints endpoints) {
         try {
             checks(endpoints);
+            String path = request.getURI().getPath();
+            Limiter instance = Limiter.getInstance();
+
+            if (path.contains("stats")) {
+                instance.getStats();
+            } else if (path.contains("server")) {
+                instance.getServer();
+            } else {
+                instance.getOther();
+            }
 
             CloseableHttpResponse response = httpClient.execute(request);
             HttpEntity entity = response.getEntity();
