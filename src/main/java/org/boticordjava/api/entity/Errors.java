@@ -2,7 +2,7 @@ package org.boticordjava.api.entity;
 
 public class Errors {
 
-    private Integer code;
+    private int code;
     private String message;
 
     public Integer getCode() {

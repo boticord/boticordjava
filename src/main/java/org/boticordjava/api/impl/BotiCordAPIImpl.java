@@ -30,13 +30,14 @@ import org.boticordjava.api.entity.users.botslist.DeveloperBots;
 import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercomments.UserComments;
 import org.boticordjava.api.io.DefaultResponseTransformer;
-import org.boticordjava.api.io.NullResponseException;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class BotiCordAPIImpl implements BotiCordAPI {
 
@@ -47,11 +48,13 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     private final String token;
     private final TokenEnum tokenEnum;
     private final int version;
+    private final boolean devMode;
 
-    protected BotiCordAPIImpl(String token) {
+    protected BotiCordAPIImpl(String token, boolean devMode) {
         this.token = token;
         this.tokenEnum = null;
         this.version = 1;
+        this.devMode = devMode;
 
         baseUrl = new HttpUrl.Builder()
                 .scheme("https")
@@ -62,10 +65,11 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    protected BotiCordAPIImpl(String token, TokenEnum tokenEnum) {
+    protected BotiCordAPIImpl(String token, TokenEnum tokenEnum, boolean devMode) {
         this.token = token;
         this.tokenEnum = tokenEnum;
         this.version = 2;
+        this.devMode = devMode;
 
         baseUrl = new HttpUrl.Builder()
                 .scheme("https")
@@ -83,7 +87,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public Result setStats(int servers, int shards, int users) {
+    public Result setStats(int servers, int shards, int users) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("stats")
                 .build();
@@ -102,7 +106,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public Comments[] getBotComments(@NotNull String botId) {
+    public Comments[] getBotComments(@NotNull String botId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bot")
                 .addPathSegment(botId)
@@ -113,7 +117,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public BotInfo getBotInformation(@NotNull String botId) {
+    public BotInfo getBotInformation(@NotNull String botId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bot")
                 .addPathSegment(botId)
@@ -122,7 +126,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public ServerInfo getServerInformation(@NotNull String botId) {
+    public ServerInfo getServerInformation(@NotNull String botId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("server")
                 .addPathSegment(botId)
@@ -131,7 +135,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public Comments[] getServerComments(@NotNull String serverId) {
+    public Comments[] getServerComments(@NotNull String serverId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("server")
                 .addPathSegment(serverId)
@@ -141,7 +145,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public GetShortLink[] getUserLinks(@NotNull String code) {
+    public GetShortLink[] getUserLinks(@NotNull String code) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("links")
                 .addPathSegment("get")
@@ -155,7 +159,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public GetShortLink[] getUserLinks() {
+    public GetShortLink[] getUserLinks() throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("links")
                 .addPathSegment("get")
@@ -166,7 +170,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) {
+    public GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("links")
                 .addPathSegment("create")
@@ -182,7 +186,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public GetShortLink createShortLink(@NotNull String code, @NotNull String link) {
+    public GetShortLink createShortLink(@NotNull String code, @NotNull String link) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("links")
                 .addPathSegment("create")
@@ -198,7 +202,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public Result deleteShortLink(@NotNull String code) {
+    public Result deleteShortLink(@NotNull String code) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("links")
                 .addPathSegment("delete")
@@ -211,7 +215,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public Result deleteShortLink(@NotNull String code, @NotNull Domain domain) {
+    public Result deleteShortLink(@NotNull String code, @NotNull Domain domain) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("links")
                 .addPathSegment("delete")
@@ -226,7 +230,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) {
+    public ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("server")
                 .build();
@@ -263,7 +267,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
     //TODO: разобраться
     @Override
-    public DeveloperBots[] getDeveloperBots(String userId) {
+    public DeveloperBots[] getDeveloperBots(String userId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bots")
                 .addPathSegment(userId)
@@ -273,7 +277,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public UserComments getUserComments(String userId) {
+    public UserComments getUserComments(String userId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("profile")
                 .addPathSegment(userId)
@@ -284,7 +288,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public UserProfile getUserProfile(String userId) {
+    public UserProfile getUserProfile(String userId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("profile")
                 .addPathSegment(userId)
@@ -298,7 +302,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return this.token;
     }
 
-    private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer, Endpoints endpoints) {
+    private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
         HttpGet request = new HttpGet(url.uri());
         request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
@@ -306,7 +310,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return execute(request, responseTransformer, endpoints);
     }
 
-    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer, Endpoints endpoints) {
+    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
         HttpPost request = new HttpPost(url.uri());
         request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
@@ -316,35 +320,54 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return execute(request, responseTransformer, endpoints);
     }
 
-    private <E> E execute(HttpRequestBase request, ResponseTransformer<E> responseTransformer, Endpoints endpoints) {
-        try {
-            checks(endpoints);
+    @Nullable
+    private <E> E execute(HttpRequestBase request, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
+        checks(endpoints);
 
+        try {
             CloseableHttpResponse response = httpClient.execute(request);
             HttpEntity entity = response.getEntity();
             String body = EntityUtils.toString(entity);
 
-            // Get HttpResponse Status
-//            System.out.println("Status: " + response.getStatusLine().getStatusCode() + " "
-//                    + response.getStatusLine().getReasonPhrase());
-
-            if (body == null) throw new NullResponseException();
-
-//            System.out.println(body);
-            if (response.getStatusLine().getStatusCode() == 401
-                    || response.getStatusLine().getStatusCode() == 404
-                    || response.getStatusLine().getStatusCode() == 403
-                    || response.getStatusLine().getStatusCode() == 400) {
-                ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
-            }
-            if (response.getStatusLine().getStatusCode() == 429) {
-                ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
-                throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
+            if (devMode) {
+                String status = String.format(
+                        "StatusCode: %s Reason: %s",
+                        response.getStatusLine().getStatusCode(),
+                        response.getStatusLine().getReasonPhrase());
+                System.out.println(status);
+                System.out.println(body);
             }
 
-            return responseTransformer.transform(body);
-        } catch (Exception e) {
+            switch (response.getStatusLine().getStatusCode()) {
+                case 400:
+                case 401:
+                case 403:
+                case 404: {
+                    ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
+                    throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+                }
+                case 429: {
+                    ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
+                    throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
+                }
+                case 200: {
+                    return responseTransformer.transform(body);
+                }
+                case 502: {
+                    body = "{\n" +
+                            "  \"error\": {\n" +
+                            "    \"code\": 502,\n" +
+                            "    \"message\": \"Bad Gateway\"\n" +
+                            "  }\n" +
+                            "}";
+                    ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
+                    throw new UnsuccessfulHttpException(502, result.getError().getMessage());
+                }
+                default:
+                    ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
+                    throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

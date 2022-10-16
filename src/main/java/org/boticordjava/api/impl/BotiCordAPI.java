@@ -1,7 +1,7 @@
 package org.boticordjava.api.impl;
 
-import org.boticordjava.api.entity.Enums.TokenEnum;
 import org.boticordjava.api.entity.Enums.Domain;
+import org.boticordjava.api.entity.Enums.TokenEnum;
 import org.boticordjava.api.entity.Result;
 import org.boticordjava.api.entity.ResultServer;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
@@ -12,6 +12,7 @@ import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.users.botslist.DeveloperBots;
 import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercomments.UserComments;
+import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +27,7 @@ public interface BotiCordAPI {
      *                <p>jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
      * @return {@link Result}
      */
-    Result setStats(int servers, int shards, int users);
+    Result setStats(int servers, int shards, int users) throws UnsuccessfulHttpException;
 
 //    /**
 //     * @param botId String botId or shortCode
@@ -44,19 +45,19 @@ public interface BotiCordAPI {
      * @param botId String botId or shortCode
      * @return {@link Comments}
      */
-    Comments[] getBotComments(@NotNull String botId);
+    Comments[] getBotComments(@NotNull String botId) throws Exception;
 
     /**
      * @param botId String botId or shortCode
      * @return {@link BotStats}
      */
-    BotInfo getBotInformation(@NotNull String botId);
+    BotInfo getBotInformation(@NotNull String botId) throws Exception;
 
     /**
      * @param botId String botId or shortCode
      * @return {@link ServerInfo}
      */
-    ServerInfo getServerInformation(@NotNull String botId);
+    ServerInfo getServerInformation(@NotNull String botId) throws Exception;
 
     /**
      * @param serverId String serverID
@@ -68,7 +69,7 @@ public interface BotiCordAPI {
      *                 <p> }
      * @return {@link Comments}
      */
-    Comments[] getServerComments(@NotNull String serverId);
+    Comments[] getServerComments(@NotNull String serverId) throws Exception;
 
     /**
      * @param code String code. The link code, if specified, then information about links with such a code is searched
@@ -80,7 +81,7 @@ public interface BotiCordAPI {
      *             <p> }
      * @return {@link GetShortLink}
      */
-    GetShortLink[] getUserLinks(@NotNull String code);
+    GetShortLink[] getUserLinks(@NotNull String code) throws Exception;
 
     /**
      * <p>
@@ -92,7 +93,7 @@ public interface BotiCordAPI {
      *
      * @return {@link GetShortLink}
      */
-    GetShortLink[] getUserLinks();
+    GetShortLink[] getUserLinks() throws Exception;
 
     /**
      * @param code   The link code to use
@@ -100,27 +101,27 @@ public interface BotiCordAPI {
      * @param domain The domain for shortening the link. By default, it costs 1 (bcord.cc ), values of 2 are possible (myservers.me ) and 3 (discord.camp)
      * @return {@link GetShortLink}
      */
-    GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain);
+    GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) throws Exception;
 
     /**
      * @param code The link code to use
      * @param link The link that needs to be shortened
      * @return {@link GetShortLink}
      */
-    GetShortLink createShortLink(@NotNull String code, @NotNull String link);
+    GetShortLink createShortLink(@NotNull String code, @NotNull String link) throws Exception;
 
     /**
      * @param code The link code to use
      * @return {@link Result}
      */
-    Result deleteShortLink(@NotNull String code);
+    Result deleteShortLink(@NotNull String code) throws Exception;
 
     /**
      * @param code   The link code to use
      * @param domain The domain of the abbreviated link. Possible values: 1 (bcord.cc ), 2 (myservers.me ) and 3 (discord.camp)
      * @return {@link Result}
      */
-    Result deleteShortLink(@NotNull String code, @NotNull Domain domain);
+    Result deleteShortLink(@NotNull String code, @NotNull Domain domain) throws Exception;
 
     /**
      * @param serverId                 String serverID serverId
@@ -137,31 +138,40 @@ public interface BotiCordAPI {
      * @param serverOwnerID            ID of the server owner (if specified, it will be updated after each request) @Nullable
      * @return {@link ResultServer}
      */
-    ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID);
+    ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) throws Exception;
 
     /**
      * @param userId String userId
      * @return {@link DeveloperBots}
      */
-    DeveloperBots[] getDeveloperBots(String userId);
+    DeveloperBots[] getDeveloperBots(String userId) throws Exception;
 
     /**
      * @param userId String userId
      * @return {@link UserComments}
      */
-    UserComments getUserComments(String userId);
+    UserComments getUserComments(String userId) throws Exception;
 
     /**
      * @param userId String userId
      * @return {@link UserProfile}
      */
-    UserProfile getUserProfile(String userId);
+    UserProfile getUserProfile(String userId) throws Exception;
 
     class Builder {
 
         // Required
         private String token = null;
         private TokenEnum tokenEnum;
+        private boolean devMode;
+
+        /**
+         * @param devMode Need logs BODY response
+         */
+        public Builder devMode(boolean devMode) {
+            this.devMode = devMode;
+            return this;
+        }
 
         /**
          * @param token Bot token, server token, or user token
@@ -192,9 +202,9 @@ public interface BotiCordAPI {
                 throw new IllegalArgumentException("The provided token cannot be null!");
 
             if (tokenEnum != null)
-                return new BotiCordAPIImpl(token, tokenEnum);
+                return new BotiCordAPIImpl(token, tokenEnum, devMode);
 
-            return new BotiCordAPIImpl(token);
+            return new BotiCordAPIImpl(token, devMode);
         }
 
     }
