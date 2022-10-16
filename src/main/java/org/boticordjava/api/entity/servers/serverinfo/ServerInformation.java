@@ -1,35 +1,17 @@
 package org.boticordjava.api.entity.servers.serverinfo;
 
-import java.util.Arrays;
-import java.util.List;
+import org.boticordjava.api.entity.abstracts.Information;
 
-public class ServerInformation {
+import java.util.Arrays;
+
+public class ServerInformation extends Information {
 
     private String name;
     private String avatar;
     private String[] members;
     private String owner;
     private String bumps;
-    private List<String> tags;
-
-    //TODO: Здесь ошибка Expected BEGIN_ARRAY but was BEGIN_OBJECT если использовать List<String> или String[]
-    private ServerShortLinks links;
-
-    private String shortDescription;
-    private String longDescription;
-    private Integer badge;
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public String getLongDescription() {
-        return longDescription;
-    }
-
-    public Integer getBadge() {
-        return badge;
-    }
+    private ServerLinks links;
 
     public String getName() {
         return name;
@@ -51,11 +33,7 @@ public class ServerInformation {
         return bumps;
     }
 
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public ServerShortLinks getLinks() {
+    public ServerLinks getLinks() {
         return links;
     }
 
@@ -67,11 +45,11 @@ public class ServerInformation {
                 "\nmembers: " + Arrays.toString(members) +
                 "\nowner: " + owner +
                 "\nbumps: " + bumps +
-                "\ntags: " + tags +
+                "\ntags: " + Arrays.toString(this.getTags()) +
                 "\nlinks: " + links +
-                "\nshortDescription: " + shortDescription +
-                "\nlongDescription: " + longDescription +
-                "\nbadge: " + badge +
+                "\nshortDescription: " + this.getShortDescription() +
+                "\nlongDescription: " + this.getLongDescription() +
+                "\nbadge: " + this.getBadge() +
                 "\n";
     }
 }

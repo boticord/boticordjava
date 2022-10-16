@@ -6,7 +6,7 @@
 
     <groupId>org.boticordjava.api</groupId>
     <artifactId>boticordjava</artifactId>
-    <version>3.4</version>
+    <version>3.5</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

@@ -10,7 +10,7 @@ public class ServerInfo {
     private String id;
     private String shortCode;
     private String status;
-    private List<String> links;
+    private String[] links;
     private Info bot;
     private ServerInformation information;
 
@@ -26,7 +26,7 @@ public class ServerInfo {
         return status;
     }
 
-    public List<String> getLinks() {
+    public String[] getLinks() {
         return links;
     }
 

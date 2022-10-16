@@ -33,7 +33,7 @@ public interface BotiCordAPI {
 //     * @param botId String botId or shortCode
 //     * @return {@link BotStats}
 //     */
-//    BotStats getBot(@NotNull String botId);
+//    BotStats getBot(@NotNull String botId) throws UnsuccessfulHttpException;
 
     /**
      * Example:
@@ -45,19 +45,19 @@ public interface BotiCordAPI {
      * @param botId String botId or shortCode
      * @return {@link Comments}
      */
-    Comments[] getBotComments(@NotNull String botId) throws Exception;
+    Comments[] getBotComments(@NotNull String botId) throws UnsuccessfulHttpException;
 
     /**
      * @param botId String botId or shortCode
      * @return {@link BotStats}
      */
-    BotInfo getBotInformation(@NotNull String botId) throws Exception;
+    BotInfo getBotInformation(@NotNull String botId) throws UnsuccessfulHttpException;
 
     /**
      * @param botId String botId or shortCode
      * @return {@link ServerInfo}
      */
-    ServerInfo getServerInformation(@NotNull String botId) throws Exception;
+    ServerInfo getServerInformation(@NotNull String botId) throws UnsuccessfulHttpException;
 
     /**
      * @param serverId String serverID
@@ -69,7 +69,7 @@ public interface BotiCordAPI {
      *                 <p> }
      * @return {@link Comments}
      */
-    Comments[] getServerComments(@NotNull String serverId) throws Exception;
+    Comments[] getServerComments(@NotNull String serverId) throws UnsuccessfulHttpException;
 
     /**
      * @param code String code. The link code, if specified, then information about links with such a code is searched
@@ -81,7 +81,7 @@ public interface BotiCordAPI {
      *             <p> }
      * @return {@link GetShortLink}
      */
-    GetShortLink[] getUserLinks(@NotNull String code) throws Exception;
+    GetShortLink[] getUserLinks(@NotNull String code) throws UnsuccessfulHttpException;
 
     /**
      * <p>
@@ -93,7 +93,7 @@ public interface BotiCordAPI {
      *
      * @return {@link GetShortLink}
      */
-    GetShortLink[] getUserLinks() throws Exception;
+    GetShortLink[] getUserLinks() throws UnsuccessfulHttpException;
 
     /**
      * @param code   The link code to use
@@ -101,27 +101,27 @@ public interface BotiCordAPI {
      * @param domain The domain for shortening the link. By default, it costs 1 (bcord.cc ), values of 2 are possible (myservers.me ) and 3 (discord.camp)
      * @return {@link GetShortLink}
      */
-    GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) throws Exception;
+    GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) throws UnsuccessfulHttpException;
 
     /**
      * @param code The link code to use
      * @param link The link that needs to be shortened
      * @return {@link GetShortLink}
      */
-    GetShortLink createShortLink(@NotNull String code, @NotNull String link) throws Exception;
+    GetShortLink createShortLink(@NotNull String code, @NotNull String link) throws UnsuccessfulHttpException;
 
     /**
      * @param code The link code to use
      * @return {@link Result}
      */
-    Result deleteShortLink(@NotNull String code) throws Exception;
+    Result deleteShortLink(@NotNull String code) throws UnsuccessfulHttpException;
 
     /**
      * @param code   The link code to use
      * @param domain The domain of the abbreviated link. Possible values: 1 (bcord.cc ), 2 (myservers.me ) and 3 (discord.camp)
      * @return {@link Result}
      */
-    Result deleteShortLink(@NotNull String code, @NotNull Domain domain) throws Exception;
+    Result deleteShortLink(@NotNull String code, @NotNull Domain domain) throws UnsuccessfulHttpException;
 
     /**
      * @param serverId                 String serverID serverId
@@ -138,25 +138,25 @@ public interface BotiCordAPI {
      * @param serverOwnerID            ID of the server owner (if specified, it will be updated after each request) @Nullable
      * @return {@link ResultServer}
      */
-    ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) throws Exception;
+    ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) throws UnsuccessfulHttpException;
 
     /**
      * @param userId String userId
      * @return {@link DeveloperBots}
      */
-    DeveloperBots[] getDeveloperBots(String userId) throws Exception;
+    DeveloperBots[] getDeveloperBots(String userId) throws UnsuccessfulHttpException;
 
     /**
      * @param userId String userId
      * @return {@link UserComments}
      */
-    UserComments getUserComments(String userId) throws Exception;
+    UserComments getUserComments(String userId) throws UnsuccessfulHttpException;
 
     /**
      * @param userId String userId
      * @return {@link UserProfile}
      */
-    UserProfile getUserProfile(String userId) throws Exception;
+    UserProfile getUserProfile(String userId) throws UnsuccessfulHttpException;
 
     class Builder {
 

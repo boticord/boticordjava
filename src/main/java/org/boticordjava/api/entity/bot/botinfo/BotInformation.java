@@ -1,22 +1,19 @@
 package org.boticordjava.api.entity.bot.botinfo;
 
+import org.boticordjava.api.entity.abstracts.Information;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 
-import java.util.List;
+import java.util.Arrays;
 
-public class BotInformation {
+public class BotInformation extends Information {
 
     private Integer bumps;
     private Integer added;
     private String prefix;
     private Long permissions;
-    private List<String> tags;
-    private List<String> developers;
+    private String[] developers;
     private Links links;
     private String library;
-    private String shortDescription;
-    private String longDescription;
-    private Integer badge;
     private BotStats stats;
     private String status;
 
@@ -36,11 +33,7 @@ public class BotInformation {
         return permissions;
     }
 
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public List<String> getDevelopers() {
+    public String[] getDevelopers() {
         return developers;
     }
 
@@ -50,18 +43,6 @@ public class BotInformation {
 
     public String getLibrary() {
         return library;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public String getLongDescription() {
-        return longDescription;
-    }
-
-    public Integer getBadge() {
-        return badge;
     }
 
     public BotStats getStats() {
@@ -79,13 +60,13 @@ public class BotInformation {
                 "\nadded: " + added +
                 "\nprefix: " + prefix +
                 "\npermissions: " + permissions +
-                "\ntags: " + tags +
-                "\ndevelopers: " + developers +
+                "\ntags: " + Arrays.toString(this.getTags()) +
+                "\ndevelopers: " + Arrays.toString(developers) +
                 "\nlinks: " + links +
                 "\nlibrary: " + library +
-                "\nshortDescription: " + shortDescription +
-                "\nlongDescription: " + longDescription +
-                "\nbadge: " + badge +
+                "\nshortDescription: " + this.getShortDescription() +
+                "\nlongDescription: " + this.getLongDescription() +
+                "\nbadge: " + this.getBadge() +
                 "\nstats: " + stats +
                 "\nstatus: " + status +
                 "\n";
