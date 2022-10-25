@@ -2,6 +2,8 @@ package org.boticordjava.api.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import okhttp3.HttpUrl;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -49,21 +51,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     private final TokenEnum tokenEnum;
     private final int version;
     private final boolean devMode;
-
-    protected BotiCordAPIImpl(String token, boolean devMode) {
-        this.token = token;
-        this.tokenEnum = null;
-        this.version = 1;
-        this.devMode = devMode;
-
-        baseUrl = new HttpUrl.Builder()
-                .scheme("https")
-                .host("api.boticord.top")
-                .addPathSegment("v1")
-                .build();
-
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
-    }
 
     protected BotiCordAPIImpl(String token, TokenEnum tokenEnum, boolean devMode) {
         this.token = token;
@@ -335,7 +322,9 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                         response.getStatusLine().getStatusCode(),
                         response.getStatusLine().getReasonPhrase());
                 System.out.println(status);
-                System.out.println(body);
+                JsonElement jsonElement = JsonParser.parseString(body);
+                String prettyJsonString = gson.toJson(jsonElement);
+                System.out.println(prettyJsonString);
             }
 
             switch (response.getStatusLine().getStatusCode()) {

@@ -166,10 +166,10 @@ public interface BotiCordAPI {
         private boolean devMode;
 
         /**
-         * @param devMode Need logs BODY response
+         * This enables LOGS
          */
-        public Builder devMode(boolean devMode) {
-            this.devMode = devMode;
+        public Builder enableDevMode() {
+            this.devMode = true;
             return this;
         }
 
@@ -198,13 +198,16 @@ public interface BotiCordAPI {
          * @throws IllegalArgumentException if token or botId null
          */
         public BotiCordAPI build() {
+            if (tokenEnum == null)
+                throw new IllegalArgumentException("The provided tokenEnum cannot be null!");
+
             if (tokenEnum != TokenEnum.NONE && token == null)
                 throw new IllegalArgumentException("The provided token cannot be null!");
 
-            if (tokenEnum != null)
+            if (token != null)
                 return new BotiCordAPIImpl(token, tokenEnum, devMode);
 
-            return new BotiCordAPIImpl(token, devMode);
+            return new BotiCordAPIImpl(null, tokenEnum, devMode);
         }
 
     }

@@ -27,7 +27,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 	<groupId>com.github.megoRU</groupId>
 	<artifactId>boticordjava</artifactId>
-	<version>v3.3</version>
+	<version>v3.7</version>
 </dependency>
 
 ```
@@ -38,49 +38,39 @@ https://jitpack.io/#megoRU/boticordjava
 
 ```java
 public static void main(String[] args) {
-
-    BotiCordAPI api = new BotiCordAPI.Builder()
-        .token("YOUR_TOKEN")
+        BotiCordAPI api = new BotiCordAPI.Builder()
+        .tokenEnum(TokenEnum.BOT)
+        .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
         .build();
-    
-    Comments[] comments = api.getBotComments("808277484524011531");
 
-    for (int i = 0; i < comments.length; i++) {
-    System.out.println(comments[i].getText());
-    System.out.println(comments[i].getUserId());
-   }
-}
+        try {
+        Comments[] comments = api.getBotComments("808277484524011531");
+
+        for (int i = 0; i < comments.length; i++) {
+        System.out.println(comments[i].getText());
+        }
+        } catch (UnsuccessfulHttpException e) {
+        System.out.println(e.getMessage());
+        }
+        }
 ```
 
 ### Update Stats
 
 ```java
-public static void main(String[] args) {
-
-    BotiCordAPI api = new BotiCordAPI.Builder()
-        .token("YOUR_TOKEN")
+    public static void main(String[] args) {
+        BotiCordAPI api = new BotiCordAPI.Builder()
+        .tokenEnum(TokenEnum.BOT)
+        .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
         .build();
-    
-    int servers = ...; // the server count
-    int shards = ...; // shards count
-    int users = ...; // the amount of users
 
-    api.setStats(servers, shards, users);
-}    
-```
-
-### How to use API v2
-
-```java
-public static void main(String[] args) {
-
-    BotiCordAPI api = new BotiCordAPI.Builder()
-        .token("YOUR_TOKEN")
-        .tokenEnum(TokenEnum.PROFILE) //This enable API v2
-        .build();
-    
-    api.createShortLink("boticordjava", "https://docs.boticord.top/libraries/boticordjava");
-}    
+        try {
+        Result result = api.setStats(500, 1, 2000);
+        System.out.println(result);
+        } catch (UnsuccessfulHttpException e) {
+        System.out.println(e.getMessage());
+    }
+}
 ```
 
 ## Dependencies
