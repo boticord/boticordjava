@@ -1,12 +1,14 @@
 package org.boticordjava.api.entity.webhooks.comment;
 
 import com.google.gson.annotations.SerializedName;
+import org.boticordjava.api.entity.webhooks.bump.bot.Bonus;
 
-public class BotComment {
+public class NewComment {
 
     private String type;
     @SerializedName("data")
     private CommentData commentData;
+    private Bonus bonus;
 
     public String getType() {
         return type;
@@ -14,5 +16,9 @@ public class BotComment {
 
     public CommentData getData() {
         return commentData;
+    }
+
+    public Bonus getBonus() {
+        return bonus;
     }
 }

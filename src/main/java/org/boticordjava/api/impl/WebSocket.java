@@ -9,6 +9,10 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.boticordjava.api.entity.webhooks.bump.bot.BotBump;
 import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
+import org.boticordjava.api.entity.webhooks.comment.DeleteComment;
+import org.boticordjava.api.entity.webhooks.comment.EditComment;
+import org.boticordjava.api.entity.webhooks.comment.NewComment;
+import org.boticordjava.api.entity.webhooks.test.TestMessage;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 
@@ -76,24 +80,24 @@ public class WebSocket {
 
                     String type = result.get("type").toString();
 
-                    DefaultResponseTransformer<?> defaultResponseTransformer = null;
+                    DefaultResponseTransformer<?> defaultResponseTransformer;
 
                     switch (type) {
                         case "new_bot_bump":
                             defaultResponseTransformer = new DefaultResponseTransformer<>(BotBump.class, gson);
                             break;
-//                        case "test_webhook_message":
-//                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
-//                            break;
-//                        case "new_bot_comment":
-//                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
-//                            break;
-//                        case "edit_bot_comment":
-//                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
-//                            break;
-//                        case "delete_bot_comment":
-//                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
-//                            break;
+                        case "test_webhook_message":
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(TestMessage.class, gson);
+                            break;
+                        case "new_bot_comment":
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(NewComment.class, gson);
+                            break;
+                        case "edit_bot_comment":
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(EditComment.class, gson);
+                            break;
+                        case "delete_bot_comment":
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(DeleteComment.class, gson);
+                            break;
 //                        case "new_server_comment":
 //                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
 //                            break;
@@ -106,6 +110,7 @@ public class WebSocket {
                         case "new_server_bump":
                             defaultResponseTransformer = new DefaultResponseTransformer<>(ServerBump.class, gson);
                             break;
+                        default: return;
                     }
 
 
