@@ -64,14 +64,12 @@ public class WebSocket {
         @Override
         public void handle(HttpExchange t) {
             try {
-                System.out.println("Test");
                 Headers requestHeaders = t.getRequestHeaders();
                 String hookKey = requestHeaders.get("X-Hook-Key")
                         .toString()
                         .replace("[", "")
                         .replace("]", "");
 
-                System.out.println(hookKey);
                 if (hookKey.equals(XHookKey)) {
                     InputStream responseBody = t.getRequestBody();
                     InputStreamReader isr = new InputStreamReader(responseBody, StandardCharsets.UTF_8);
@@ -110,10 +108,8 @@ public class WebSocket {
 
                     webhooks(defaultResponseTransformer, collect);
 
-                    System.out.println(collect);
                     br.close();
                     isr.close();
-
                     //Отправка отправителю статус 200
                     String response = "200";
                     t.sendResponseHeaders(200, response.length());
