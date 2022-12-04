@@ -16,6 +16,8 @@ import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Queue;
+
 public interface BotiCordAPI {
 
     /**
