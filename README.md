@@ -1,5 +1,5 @@
 <div align="center ">
-	
+
 <p></p>
     <a href="https://boticord.top"><img src="https://megoru.ru/boticordapi2.png"  alt="boticord.js"/></a>
 <p>
@@ -9,25 +9,26 @@
 </div>
 
 # BotiCordJava
-An API wrapper for https://boticord.top/ written in Java by @megoRU
 
+An API wrapper for https://boticord.top/ written in Java by @megoRU
 
 ### Maven
 
 https://jitpack.io/#megoRU/boticordjava
 
 ```xml
+
 <repositories>
- <repository>
-	<id>jitpack.io</id>
-	<url>https://jitpack.io</url>
- </repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 
 <dependency>
-	<groupId>com.github.megoRU</groupId>
-	<artifactId>boticordjava</artifactId>
-	<version>v3.7</version>
+<groupId>com.github.megoRU</groupId>
+<artifactId>boticordjava</artifactId>
+<version>v3.7</version>
 </dependency>
 
 ```
@@ -37,19 +38,19 @@ https://jitpack.io/#megoRU/boticordjava
 ### Get All Comments by bot ID
 
 ```java
-public static void main(String[] args) {
-        BotiCordAPI api = new BotiCordAPI.Builder()
+public static void main(String[]args){
+        BotiCordAPI api=new BotiCordAPI.Builder()
         .tokenEnum(TokenEnum.BOT)
         .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
         .build();
 
-        try {
-        Comments[] comments = api.getBotComments("808277484524011531");
+        try{
+        Comments[]comments=api.getBotComments("808277484524011531");
 
-        for (int i = 0; i < comments.length; i++) {
+        for(int i=0;i<comments.length;i++){
         System.out.println(comments[i].getText());
         }
-        } catch (UnsuccessfulHttpException e) {
+        }catch(UnsuccessfulHttpException e){
         System.out.println(e.getMessage());
         }
         }
@@ -58,19 +59,19 @@ public static void main(String[] args) {
 ### Update Stats
 
 ```java
-    public static void main(String[] args) {
-        BotiCordAPI api = new BotiCordAPI.Builder()
+    public static void main(String[]args){
+        BotiCordAPI api=new BotiCordAPI.Builder()
         .tokenEnum(TokenEnum.BOT)
         .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
         .build();
 
-        try {
-        Result result = api.setStats(500, 1, 2000);
+        try{
+        Result result=api.setStats(500,1,2000);
         System.out.println(result);
-        } catch (UnsuccessfulHttpException e) {
+        }catch(UnsuccessfulHttpException e){
         System.out.println(e.getMessage());
-    }
-}
+        }
+        }
 ```
 
 ### WebHooks
@@ -78,36 +79,27 @@ public static void main(String[] args) {
 Note: BotiCord supports only `HTTPS` you need proxy `ip:port` to `Apache`/`nginx` with **HTTPS**
 
 ```java
+public class Main {
+    static class Comment extends ListenerAdapter {
+        @Override
+        public void onCommentEvent(@NotNull CommentAction event) {
+            System.out.println(event.getType()); //delete_bot_comment
+        }
+    }
+
+    static class ServerBumpEvent extends ListenerAdapter {
+        @Override
+        public void onServerBumpEvent(@NotNull ServerBump event) {
+            System.out.println(event.getType()); //new_server_bump
+        }
+    }
+
     public static void main(String[] args) {
         WebSocket webSocket = new WebSocket("3fbf63cefsfs2321a", null, 8080);
-
-        while (true) {
-        Queue<WebhookListener> webhookQueue = webSocket.getWebhookQueue();
-        for (int i = 0; i < webhookQueue.size(); i++) {
-        WebhookListener poll = webhookQueue.poll();
-        String type = poll.getType();
-        
-        //If type == Type.DELETE_BOT_COMMENT
-        if (Type.equals(type, Type.DELETE_BOT_COMMENT)) {
-             CommentAction commentAction = (CommentAction) poll;
-             String oldComment = commentAction.getData().getComment().getOldComment();
-             System.out.println(oldComment);
-             }
-          }
-
-        //If WebhookListener instanceOf BotBump
-        if (poll instanceof BotBump) {
-              BotBump botBump = (BotBump) poll;
-              String user = botBump.getData().getUser();
-              System.out.println(user);
-        }   
-          
-        Thread.sleep(1000);
-        }
+        webSocket.addListener(new Comment(), new ServerBumpEvent());
     }
 }
 ```
-
 
 ## Dependencies
 

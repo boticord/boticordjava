@@ -11,6 +11,9 @@ import org.boticordjava.api.entity.webhooks.WebhookListener;
 import org.boticordjava.api.entity.webhooks.bump.bot.BotBump;
 import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
 import org.boticordjava.api.entity.webhooks.comment.CommentAction;
+import org.boticordjava.api.entity.webhooks.comment.Type;
+import org.boticordjava.api.entity.webhooks.observer.Initiator;
+import org.boticordjava.api.entity.webhooks.observer.ListenerAdapter;
 import org.boticordjava.api.entity.webhooks.test.TestMessage;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
@@ -22,19 +25,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class WebSocket {
 
     private final Gson gson;
-    private final Queue<WebhookListener> webhookQueue;
     private final String XHookKey;
     private final String path;
     private final int port;
+    private final static Initiator INITIATOR = new Initiator();
 
     /**
      * @param xHookKey String X-Hook-Key for filter request
@@ -43,7 +44,6 @@ public class WebSocket {
      */
     public WebSocket(String xHookKey, @Nullable String path, int port) {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
-        this.webhookQueue = new ArrayDeque<>();
         this.XHookKey = xHookKey;
         this.path = path == null ? "/" : path;
         this.port = port;
@@ -91,27 +91,26 @@ public class WebSocket {
                     ObjectMapper mapper = new ObjectMapper();
                     HashMap<String, Object> result = mapper.readValue(collect, HashMap.class);
 
-                    String type = result.get("type").toString();
-
+                    Type type = Type.valueOf(result.get("type").toString().toUpperCase());
                     DefaultResponseTransformer<?> defaultResponseTransformer;
 
                     switch (type) {
-                        case "new_bot_bump":
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(BotBump.class, gson);
-                            break;
-                        case "test_webhook_message":
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(TestMessage.class, gson);
-                            break;
-                        case "new_bot_comment":
-                        case "edit_bot_comment":
-                        case "delete_bot_comment":
-                        case "new_server_comment":
-                        case "edit_server_comment":
-                        case "delete_server_comment":
+                        case EDIT_BOT_COMMENT:
+                        case DELETE_BOT_COMMENT:
+                        case NEW_SERVER_COMMENT:
+                        case EDIT_SERVER_COMMENT:
+                        case DELETE_SERVER_COMMENT:
+                        case NEW_BOT_COMMENT:
                             defaultResponseTransformer = new DefaultResponseTransformer<>(CommentAction.class, gson);
                             break;
-                        case "new_server_bump":
+                        case NEW_BOT_BUMP:
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(BotBump.class, gson);
+                            break;
+                        case NEW_SERVER_BUMP:
                             defaultResponseTransformer = new DefaultResponseTransformer<>(ServerBump.class, gson);
+                            break;
+                        case TEST_WEBHOOK_MESSAGE:
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(TestMessage.class, gson);
                             break;
                         default:
                             return;
@@ -138,13 +137,17 @@ public class WebSocket {
     private <E> void webhooks(ResponseTransformer<E> responseTransformer, String response) {
         if (responseTransformer != null) {
             WebhookListener transform = (WebhookListener) responseTransformer.transform(response);
-            webhookQueue.add(transform);
+            INITIATOR.handle(transform);
         }
     }
 
-    public Queue<WebhookListener> getWebhookQueue() {
-        return webhookQueue;
+    public void addListener(ListenerAdapter listenerAdapter) {
+        INITIATOR.addListener(listenerAdapter);
     }
+    public void addListener(ListenerAdapter... listenerAdapter) {
+        INITIATOR.addListener(listenerAdapter);
+    }
+
 
     public String getXHookKey() {
         return XHookKey;

@@ -7,7 +7,10 @@ public enum Type {
     DELETE_BOT_COMMENT,
     NEW_SERVER_COMMENT,
     EDIT_SERVER_COMMENT,
-    DELETE_SERVER_COMMENT;
+    DELETE_SERVER_COMMENT,
+    TEST_WEBHOOK_MESSAGE,
+    NEW_SERVER_BUMP,
+    NEW_BOT_BUMP;
 
     public static boolean equals(String s, Type type) {
         Type typeFrom = Type.valueOf(s.toUpperCase());
