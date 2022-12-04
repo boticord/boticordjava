@@ -24,6 +24,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,17 @@ public class WebSocket {
         public void handle(HttpExchange t) {
             try {
                 Headers requestHeaders = t.getRequestHeaders();
-                String hookKey = requestHeaders.get("X-Hook-Key")
+                List<String> strings = requestHeaders.get("X-Hook-Key");
+                if (strings == null || strings.isEmpty()) {
+                    String response = "400 Bad Request";
+                    t.sendResponseHeaders(400 , response.length());
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                    return;
+                }
+
+                String hookKey = strings
                         .toString()
                         .replace("[", "")
                         .replace("]", "");
