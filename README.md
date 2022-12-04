@@ -28,7 +28,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 <groupId>com.github.megoRU</groupId>
 <artifactId>boticordjava</artifactId>
-<version>v3.7</version>
+<version>v4.0</version>
 </dependency>
 
 ```
@@ -38,40 +38,44 @@ https://jitpack.io/#megoRU/boticordjava
 ### Get All Comments by bot ID
 
 ```java
-public static void main(String[]args){
-        BotiCordAPI api=new BotiCordAPI.Builder()
-        .tokenEnum(TokenEnum.BOT)
-        .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
-        .build();
+public class Main {
+    public static void main(String[] args) {
+        BotiCordAPI api = new BotiCordAPI.Builder()
+                .tokenEnum(TokenEnum.BOT)
+                .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
+                .build();
 
-        try{
-        Comments[]comments=api.getBotComments("808277484524011531");
+        try {
+            Comments[] comments = api.getBotComments("808277484524011531");
 
-        for(int i=0;i<comments.length;i++){
-        System.out.println(comments[i].getText());
+            for (int i = 0; i < comments.length; i++) {
+                System.out.println(comments[i].getText());
+            }
+        } catch (UnsuccessfulHttpException e) {
+            System.out.println(e.getMessage());
         }
-        }catch(UnsuccessfulHttpException e){
-        System.out.println(e.getMessage());
-        }
-        }
+    }
+}
 ```
 
 ### Update Stats
 
 ```java
-    public static void main(String[]args){
-        BotiCordAPI api=new BotiCordAPI.Builder()
-        .tokenEnum(TokenEnum.BOT)
-        .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
-        .build();
+public class Main {
+    public static void main(String[] args) {
+        BotiCordAPI api = new BotiCordAPI.Builder()
+                .tokenEnum(TokenEnum.BOT)
+                .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
+                .build();
 
-        try{
-        Result result=api.setStats(500,1,2000);
-        System.out.println(result);
-        }catch(UnsuccessfulHttpException e){
-        System.out.println(e.getMessage());
+        try {
+            Result result = api.setStats(500, 1, 2000);
+            System.out.println(result);
+        } catch (UnsuccessfulHttpException e) {
+            System.out.println(e.getMessage());
         }
-        }
+    }
+}
 ```
 
 ### WebHooks
