@@ -7,20 +7,19 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.boticordjava.api.entity.webhooks.WebhookListener;
 import org.boticordjava.api.entity.webhooks.bump.bot.BotBump;
 import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
-import org.boticordjava.api.entity.webhooks.comment.DeleteComment;
-import org.boticordjava.api.entity.webhooks.comment.EditComment;
-import org.boticordjava.api.entity.webhooks.comment.NewComment;
+import org.boticordjava.api.entity.webhooks.comment.CommentAction;
 import org.boticordjava.api.entity.webhooks.test.TestMessage;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
@@ -31,24 +30,29 @@ import java.util.stream.Collectors;
 public class WebSocket {
 
     private final Gson gson;
-    private final Queue<Object> webhookQueue;
+    private final Queue<WebhookListener> webhookQueue;
     private final String XHookKey;
     private final String path;
     private final int port;
 
-    public WebSocket(String xHookKey, String path, InetAddress ip, int port) {
+    /**
+     * @param xHookKey String X-Hook-Key for filter request
+     * @param path String Can be NULL. Example: <a href="https://api.megoru.ru/path">https://api.megoru.ru/*path*</a>
+     * @param port int You can use one of the free ports on your system
+     */
+    public WebSocket(String xHookKey, @Nullable String path, int port) {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.webhookQueue = new ArrayDeque<>();
         this.XHookKey = xHookKey;
-        this.path = path;
+        this.path = path == null ? "/" : path;
         this.port = port;
-        createServer(ip, port, path);
+        createServer(port, path == null ? "/" : path);
     }
 
-    private void createServer(InetAddress ip, int port, String path) {
+    private void createServer(int port, String path) {
         try {
-            HttpServer server = HttpServer.create(new InetSocketAddress(ip, port), 0);
-            server.createContext(path == null ? "/" : path, new MyHandler());
+            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            server.createContext(path, new MyHandler());
             server.setExecutor(null);
             server.start();
         } catch (Exception e) {
@@ -90,31 +94,22 @@ public class WebSocket {
                             defaultResponseTransformer = new DefaultResponseTransformer<>(TestMessage.class, gson);
                             break;
                         case "new_bot_comment":
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(NewComment.class, gson);
-                            break;
                         case "edit_bot_comment":
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(EditComment.class, gson);
-                            break;
                         case "delete_bot_comment":
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(DeleteComment.class, gson);
+                        case "new_server_comment":
+                        case "edit_server_comment":
+                        case "delete_server_comment":
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(CommentAction.class, gson);
                             break;
-//                        case "new_server_comment":
-//                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
-//                            break;
-//                        case "edit_server_comment":
-//                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
-//                            break;
-//                        case "delete_server_comment":
-//                            defaultResponseTransformer = new DefaultResponseTransformer<>(Vote.class, gson);
-//                            break;
                         case "new_server_bump":
                             defaultResponseTransformer = new DefaultResponseTransformer<>(ServerBump.class, gson);
                             break;
-                        default: return;
+                        default:
+                            return;
                     }
 
-
                     webhooks(defaultResponseTransformer, collect);
+
                     System.out.println(collect);
                     br.close();
                     isr.close();
@@ -135,12 +130,12 @@ public class WebSocket {
 
     private <E> void webhooks(ResponseTransformer<E> responseTransformer, String response) {
         if (responseTransformer != null) {
-            E transform = responseTransformer.transform(response);
+            WebhookListener transform = (WebhookListener) responseTransformer.transform(response);
             webhookQueue.add(transform);
         }
     }
 
-    public Queue<Object> getWebhookQueue() {
+    public Queue<WebhookListener> getWebhookQueue() {
         return webhookQueue;
     }
 

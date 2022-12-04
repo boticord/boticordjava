@@ -73,6 +73,42 @@ public static void main(String[] args) {
 }
 ```
 
+### WebHooks
+
+Note: BotiCord supports only `HTTPS` you need proxy `ip:port` to `Apache`/`nginx` with **HTTPS**
+
+```java
+    public static void main(String[] args) {
+        WebSocket webSocket = new WebSocket("3fbf63cefsfs2321a", null, 8080);
+
+        while (true) {
+        Queue<WebhookListener> webhookQueue = webSocket.getWebhookQueue();
+        for (int i = 0; i < webhookQueue.size(); i++) {
+        WebhookListener poll = webhookQueue.poll();
+        String type = poll.getType();
+        
+        //If type == Type.DELETE_BOT_COMMENT
+        if (Type.equals(type, Type.DELETE_BOT_COMMENT)) {
+             CommentAction commentAction = (CommentAction) poll;
+             String oldComment = commentAction.getData().getComment().getOldComment();
+             System.out.println(oldComment);
+             }
+          }
+
+        //If WebhookListener instanceOf BotBump
+        if (poll instanceof BotBump) {
+              BotBump botBump = (BotBump) poll;
+              String user = botBump.getData().getUser();
+              System.out.println(user);
+        }   
+          
+        Thread.sleep(1000);
+        }
+    }
+}
+```
+
+
 ## Dependencies
 
 1. [Gson](https://github.com/google/gson)

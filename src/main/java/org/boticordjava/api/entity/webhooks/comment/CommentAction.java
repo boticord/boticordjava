@@ -1,9 +1,10 @@
 package org.boticordjava.api.entity.webhooks.comment;
 
 import com.google.gson.annotations.SerializedName;
+import org.boticordjava.api.entity.webhooks.WebhookListener;
 import org.boticordjava.api.entity.webhooks.bump.bot.Bonus;
 
-public class EditComment {
+public class CommentAction implements WebhookListener {
 
     private String type;
     @SerializedName("data")

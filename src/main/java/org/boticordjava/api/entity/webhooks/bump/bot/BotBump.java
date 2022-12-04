@@ -1,7 +1,8 @@
 package org.boticordjava.api.entity.webhooks.bump.bot;
 
+import org.boticordjava.api.entity.webhooks.WebhookListener;
 
-public class BotBump {
+public class BotBump implements WebhookListener {
 
     private String type;
     private Data data;
