@@ -9,7 +9,10 @@ import org.jetbrains.annotations.NotNull;
 public abstract class ListenerAdapter {
 
     public void onTestEvent(@NotNull TestMessage event) {}
+
     public void onCommentEvent(@NotNull CommentAction event) {}
+
     public void onBotBumpEvent(@NotNull BotBump event) {}
+
     public void onServerBumpEvent(@NotNull ServerBump event) {}
 }

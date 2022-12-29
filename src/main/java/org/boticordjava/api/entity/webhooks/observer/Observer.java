@@ -6,20 +6,16 @@ import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
 import org.boticordjava.api.entity.webhooks.comment.CommentAction;
 import org.boticordjava.api.entity.webhooks.comment.Type;
 import org.boticordjava.api.entity.webhooks.test.TestMessage;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class Initiator {
+public class Observer {
 
     private final List<ListenerAdapter> listeners = new ArrayList<>();
 
-    public void addListener(ListenerAdapter listenerAdapter) {
-        listeners.add(listenerAdapter);
-    }
-
-    public void addListener(ListenerAdapter... listenerAdapter) {
-        listeners.addAll(List.of(listenerAdapter));
+    public void addListener(@NotNull ListenerAdapter... listenerAdapter) {
+        Collections.addAll(this.listeners, listenerAdapter);
     }
 
     public void handle(WebhookListener commentAction) {

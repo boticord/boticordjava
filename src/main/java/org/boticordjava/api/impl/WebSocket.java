@@ -12,7 +12,7 @@ import org.boticordjava.api.entity.webhooks.bump.bot.BotBump;
 import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
 import org.boticordjava.api.entity.webhooks.comment.CommentAction;
 import org.boticordjava.api.entity.webhooks.comment.Type;
-import org.boticordjava.api.entity.webhooks.observer.Initiator;
+import org.boticordjava.api.entity.webhooks.observer.Observer;
 import org.boticordjava.api.entity.webhooks.observer.ListenerAdapter;
 import org.boticordjava.api.entity.webhooks.test.TestMessage;
 import org.boticordjava.api.io.DefaultResponseTransformer;
@@ -35,7 +35,7 @@ public class WebSocket {
     private final String XHookKey;
     private final String path;
     private final int port;
-    private final static Initiator INITIATOR = new Initiator();
+    private final Observer Observer = new Observer();
 
     /**
      * @param xHookKey String X-Hook-Key for filter request
@@ -137,17 +137,13 @@ public class WebSocket {
     private <E> void webhooks(ResponseTransformer<E> responseTransformer, String response) {
         if (responseTransformer != null) {
             WebhookListener transform = (WebhookListener) responseTransformer.transform(response);
-            INITIATOR.handle(transform);
+            Observer.handle(transform);
         }
     }
 
-    public void addListener(ListenerAdapter listenerAdapter) {
-        INITIATOR.addListener(listenerAdapter);
-    }
     public void addListener(ListenerAdapter... listenerAdapter) {
-        INITIATOR.addListener(listenerAdapter);
+        Observer.addListener(listenerAdapter);
     }
-
 
     public String getXHookKey() {
         return XHookKey;
