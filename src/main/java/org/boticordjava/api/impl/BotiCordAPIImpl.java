@@ -5,17 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import okhttp3.HttpUrl;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.boticordjava.api.BoticordUtils;
 import org.boticordjava.api.entity.Enums.Domain;
 import org.boticordjava.api.entity.Enums.Endpoints;
@@ -46,7 +43,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     private final HttpUrl baseUrl;
 
     private final Gson gson;
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
     private final String token;
     private final TokenEnum tokenEnum;
     private final int version;
@@ -308,57 +304,73 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Nullable
-    private <E> E execute(HttpRequestBase request, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
+    private <E> E execute(ClassicHttpRequest request, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
         checks(endpoints);
+        CloseableHttpClient httpClient = HttpClients
+                .custom()
+                .setConnectionReuseStrategy(((requests, response, context) -> false))
+                .useSystemProperties()
+                .build();
 
         try {
-            CloseableHttpResponse response = httpClient.execute(request);
-            HttpEntity entity = response.getEntity();
-            String body = EntityUtils.toString(entity);
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int statusCode = response.getCode();
+                HttpEntity entity = response.getEntity();
+                String body = entity != null ? EntityUtils.toString(entity) : null;
+                if (body == null) body = "{}";
 
-            if (devMode) {
-                String status = String.format(
-                        "StatusCode: %s Reason: %s",
-                        response.getStatusLine().getStatusCode(),
-                        response.getStatusLine().getReasonPhrase());
-                System.out.println(status);
-                JsonElement jsonElement = JsonParser.parseString(body);
-                String prettyJsonString = gson.toJson(jsonElement);
-                System.out.println(prettyJsonString);
-            }
+                logResponse(response, body);
 
-            switch (response.getStatusLine().getStatusCode()) {
-                case 400:
-                case 401:
-                case 403:
-                case 404: {
-                    ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                    throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+                switch (statusCode) {
+                    case 400:
+                    case 401:
+                    case 403:
+                    case 404: {
+                        ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
+                        throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+                    }
+                    case 429: {
+                        ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
+                        throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
+                    }
+                    case 200: {
+                        return responseTransformer.transform(body);
+                    }
+                    case 502: {
+                        body = "{\n" +
+                                "  \"error\": {\n" +
+                                "    \"code\": 502,\n" +
+                                "    \"message\": \"Bad Gateway\"\n" +
+                                "  }\n" +
+                                "}";
+                        ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
+                        throw new UnsuccessfulHttpException(502, result.getError().getMessage());
+                    }
+                    default:
+                        ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
+                        throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
                 }
-                case 429: {
-                    ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
-                    throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
-                }
-                case 200: {
-                    return responseTransformer.transform(body);
-                }
-                case 502: {
-                    body = "{\n" +
-                            "  \"error\": {\n" +
-                            "    \"code\": 502,\n" +
-                            "    \"message\": \"Bad Gateway\"\n" +
-                            "  }\n" +
-                            "}";
-                    ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                    throw new UnsuccessfulHttpException(502, result.getError().getMessage());
-                }
-                default:
-                    ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                    throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                httpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        throw new RuntimeException();
+    }
+
+    private void logResponse(ClassicHttpResponse response, String body) {
+        if (!devMode) return;
+        String status = String.format("StatusCode: %s Reason: %s", response.getCode(), response.getReasonPhrase());
+        System.out.println(status);
+        JsonElement jsonElement = JsonParser.parseString(body);
+        String prettyJsonString = gson.toJson(jsonElement);
+        System.out.println(prettyJsonString);
     }
 }
