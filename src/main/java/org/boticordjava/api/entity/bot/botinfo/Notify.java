@@ -2,7 +2,7 @@ package org.boticordjava.api.entity.bot.botinfo;
 
 public class Notify {
 
-    boolean enabled;
+    private boolean enabled;
 
     public boolean isEnabled() {
         return enabled;

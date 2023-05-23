@@ -20,15 +20,15 @@ import java.util.Queue;
 public interface BotiCordAPI {
 
     /**
-     * @param servers server count
-     * @param shards  shard count
-     * @param users   users count
+     * @param members members count
+     * @param guilds  guild count
+     * @param shards  shards count
      *                <p>Example:
      *                <p>AtomicInteger usersCount = new AtomicInteger();
      *                <p>jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
-     * @return {@link Result}
+     * @return {@link BotInfo}
      */
-//    Result setStats(int servers, int shards, int users) throws UnsuccessfulHttpException;
+    BotInfo setStats(String botId, int members, int guilds, int shards) throws UnsuccessfulHttpException;
 
 //    /**
 //     * @param botId String botId or shortCode

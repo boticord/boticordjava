@@ -1,6 +1,6 @@
 package org.boticordjava.api.entity.bot.botinfo;
 
-public class Ratings {
+public class ResourceRating {
 
     private int count;
     private int rating;

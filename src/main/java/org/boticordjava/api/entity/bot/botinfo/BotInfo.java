@@ -1,6 +1,5 @@
 package org.boticordjava.api.entity.bot.botinfo;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class BotInfo {
@@ -15,11 +14,11 @@ public class BotInfo {
     private int standardBannerID;
     private String owner;
     private int status;
-    private Ratings[] ratings;
+    private ResourceRating[] ratings;
     private List<String> tags;
     private String prefix;
     private String discriminator;
-    private String createdDate; //"2023-05-22T22:12:15.637Z"
+    private String createdDate; //TODO: "2023-05-22T22:12:15.637Z"
     private String supportServerInviteCode;
     private int library;
     private int guilds;
@@ -30,13 +29,13 @@ public class BotInfo {
     private Notify notify;
     private Developers[] developers;
     private int upCount;
-    private String[] ups;
+    private ResourceUp[] ups;
 
-    public String[] getUps() {
+    public ResourceUp[] getUps() {
         return ups;
     }
 
-    public void setUps(String[] ups) {
+    public void setUps(ResourceUp[] ups) {
         this.ups = ups;
     }
 
@@ -112,19 +111,19 @@ public class BotInfo {
         this.owner = owner;
     }
 
-    public int getStatus() {
-        return status;
+    public Status getStatus() {
+        return Status.find(status);
     }
 
     public void setStatus(int status) {
         this.status = status;
     }
 
-    public Ratings[] getRatings() {
+    public ResourceRating[] getRatings() {
         return ratings;
     }
 
-    public void setRatings(Ratings[] ratings) {
+    public void setRatings(ResourceRating[] ratings) {
         this.ratings = ratings;
     }
 

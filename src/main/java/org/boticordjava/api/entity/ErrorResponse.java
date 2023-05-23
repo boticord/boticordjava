@@ -2,13 +2,31 @@ package org.boticordjava.api.entity;
 
 public class ErrorResponse {
 
-    public Errors error;
+    private String ok;
+    private String service;
+    private Errors[] errors;
 
-    public ErrorResponse(Errors error) {
-        this.error = error;
+    public String getOk() {
+        return ok;
     }
 
-    public Errors getError() {
-        return error;
+    public void setOk(String ok) {
+        this.ok = ok;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
+    }
+
+    public Errors[] getErrors() {
+        return errors;
+    }
+
+    public void setErrors(Errors[] errors) {
+        this.errors = errors;
     }
 }

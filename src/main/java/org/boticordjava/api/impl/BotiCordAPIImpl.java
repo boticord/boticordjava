@@ -6,11 +6,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import okhttp3.HttpUrl;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.boticordjava.api.ResponseHandler;
 import org.boticordjava.api.entity.ErrorResponse;
 import org.boticordjava.api.entity.ErrorResponseToMany;
@@ -19,6 +21,8 @@ import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -43,24 +47,26 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
-//    @Override
-//    public Result setStats(int servers, int shards, int users) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("stats")
-//                .build();
-//
-//        JSONObject json = new JSONObject();
-//
-//        try {
-//            json.put("servers", servers);
-//            json.put("shards", shards);
-//            json.put("users", users);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
-//    }
+    @Override
+    public BotInfo setStats(@NotNull String botId, int members, int guilds, int shards) throws UnsuccessfulHttpException {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("bots")
+                .addPathSegment(botId)
+                .addPathSegment("stats")
+                .build();
+
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("members", members);
+            json.put("guilds", guilds);
+            json.put("shards", shards);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return post(url, json, new DefaultResponseTransformer<>(gson, BotInfo.class)).getResult();
+    }
 
 //    @Override
 //    public Comments[] getBotComments(@NotNull String botId) throws UnsuccessfulHttpException {
@@ -266,15 +272,15 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return execute(request, responseTransformer);
     }
 
-//    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer) throws UnsuccessfulHttpException {
-//        HttpPost request = new HttpPost(url.uri());
-//        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-//        request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
-//
-//        HttpEntity stringEntity = new StringEntity(jsonBody.toString(), ContentType.APPLICATION_JSON);
-//        request.setEntity(stringEntity);
-//        return execute(request, responseTransformer);
-//    }
+    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer) throws UnsuccessfulHttpException {
+        HttpPost request = new HttpPost(url.uri());
+        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
+
+        HttpEntity stringEntity = new StringEntity(jsonBody.toString(), ContentType.APPLICATION_JSON);
+        request.setEntity(stringEntity);
+        return execute(request, responseTransformer);
+    }
 
     private <E> E execute(ClassicHttpRequest request, ResponseTransformer<E> responseTransformer) throws UnsuccessfulHttpException {
         CloseableHttpClient httpClient = HttpClients
@@ -293,19 +299,20 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 logResponse(response, body);
 
                 switch (statusCode) {
+                    case 201:
+                    case 200: {
+                        return responseTransformer.transform(body);
+                    }
                     case 400:
                     case 401:
                     case 403:
                     case 404: {
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                        throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+                        throw new UnsuccessfulHttpException(result.getErrors()[0].getCode(), result.getErrors()[0].getMessage());
                     }
                     case 429: {
                         ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
                         throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
-                    }
-                    case 200: {
-                        return responseTransformer.transform(body);
                     }
                     case 502: {
                         body = "{\n" +
@@ -315,11 +322,11 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                                 "  }\n" +
                                 "}";
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                        throw new UnsuccessfulHttpException(502, result.getError().getMessage());
+                        throw new UnsuccessfulHttpException(502, result.getErrors()[0].getMessage());
                     }
                     default:
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                        throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+                        throw new UnsuccessfulHttpException(result.getErrors()[0].getCode(), result.getErrors()[0].getMessage());
                 }
             } catch (ParseException e) {
                 throw new RuntimeException(e);
