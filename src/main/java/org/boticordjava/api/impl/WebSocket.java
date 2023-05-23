@@ -101,22 +101,22 @@ public class WebSocket {
                         case EDIT_SERVER_COMMENT:
                         case DELETE_SERVER_COMMENT:
                         case NEW_BOT_COMMENT:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(CommentAction.class, gson);
+//                            defaultResponseTransformer = new DefaultResponseTransformer<>(CommentAction.class, gson);
                             break;
                         case NEW_BOT_BUMP:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(BotBump.class, gson);
+//                            defaultResponseTransformer = new DefaultResponseTransformer<>(BotBump.class, gson);
                             break;
                         case NEW_SERVER_BUMP:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(ServerBump.class, gson);
+//                            defaultResponseTransformer = new DefaultResponseTransformer<>(ServerBump.class, gson);
                             break;
                         case TEST_WEBHOOK_MESSAGE:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(TestMessage.class, gson);
+//                            defaultResponseTransformer = new DefaultResponseTransformer<>(TestMessage.class, gson);
                             break;
                         default:
                             return;
                     }
 
-                    webhooks(defaultResponseTransformer, collect);
+//                    webhooks(defaultResponseTransformer, collect);
 
                     br.close();
                     isr.close();

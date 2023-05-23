@@ -12,4 +12,11 @@ public abstract class AbstractInfo {
     public boolean isApproved() {
         return approved;
     }
+
+    @Override
+    public String toString() {
+        return "\nid: " + id +
+                "\napproved: " + approved +
+                "\n";
+    }
 }

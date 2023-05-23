@@ -17,4 +17,12 @@ public class BotStats {
     public Integer getUsers() {
         return users;
     }
+
+    @Override
+    public String toString() {
+        return "servers: " + servers +
+                "\nshards: " + shards +
+                "\nusers: " + users +
+                "\n";
+    }
 }
