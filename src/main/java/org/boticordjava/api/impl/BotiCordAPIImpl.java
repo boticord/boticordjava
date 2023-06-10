@@ -44,7 +44,7 @@ import java.util.List;
 public class BotiCordAPIImpl implements BotiCordAPI {
 
     private final HttpUrl baseUrl;
-
+    private final String searchURL = "https://api.arbuz.pro/search/";
     private final Gson gson;
     private final String token;
     private final String searchApiKey;
@@ -106,7 +106,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     @Override
     public List<ServerInfo> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
         if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
-        Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
+        Client client = new Client(new Config(searchURL, searchApiKey));
         Index index = client.index("servers");
         SearchResult searchResult = index.search(text);
         ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
@@ -123,7 +123,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     @Override
     public List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
         if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
-        Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
+        Client client = new Client(new Config(searchURL, searchApiKey));
         Index index = client.index("bots");
         SearchResult searchResult = index.search(text);
         ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
@@ -131,6 +131,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         for (HashMap<String, Object> hit : hits) {
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(hit);
+            System.out.println(json);
             BotsSearch botsSearch = gson.fromJson(json, BotsSearch.class);
             botsSearchList.add(botsSearch);
         }
@@ -140,7 +141,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     @Override
     public List<UsersCommentSearch> searchUserComments(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
         if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
-        Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
+        Client client = new Client(new Config(searchURL, searchApiKey));
         Index index = client.index("comments");
         SearchResult searchResult = index.search(text);
         ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
@@ -202,34 +203,29 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 logResponse(response, body);
 
                 switch (statusCode) {
-                    case 201:
-                    case 200: {
+                    case 201, 200 -> {
                         return responseTransformer.transform(body);
                     }
-                    case 400:
-                    case 401:
-                    case 403:
-                    case 404: {
-                        ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                        throw new UnsuccessfulHttpException(result.getErrors()[0].getCode(), result.getErrors()[0].getMessage());
-                    }
-                    case 429: {
+                    case 429 -> {
                         ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
                         throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
                     }
-                    case 502: {
-                        body = "{\n" +
-                                "  \"error\": {\n" +
-                                "    \"code\": 502,\n" +
-                                "    \"message\": \"Bad Gateway\"\n" +
-                                "  }\n" +
-                                "}";
+                    case 502 -> {
+                        body = """
+                                {
+                                  "error": {
+                                    "code": 502,
+                                    "message": "Bad Gateway"
+                                  }
+                                }
+                                """;
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                         throw new UnsuccessfulHttpException(502, result.getErrors()[0].getMessage());
                     }
-                    default:
+                    default -> {
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                         throw new UnsuccessfulHttpException(result.getErrors()[0].getCode(), result.getErrors()[0].getMessage());
+                    }
                 }
             } catch (ParseException e) {
                 throw new RuntimeException(e);
