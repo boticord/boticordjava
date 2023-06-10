@@ -1,4 +1,4 @@
-package org.boticordjava.api.entity.bot.botinfo;
+package org.boticordjava.api.entity.enums;
 
 public enum Library {
 

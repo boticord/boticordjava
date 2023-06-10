@@ -1,5 +1,8 @@
 package org.boticordjava.api.entity.bot.botinfo;
 
+import org.boticordjava.api.entity.enums.BotTags;
+import org.boticordjava.api.entity.enums.Library;
+
 import java.util.List;
 
 public class BotInfo {
@@ -11,9 +14,13 @@ public class BotInfo {
     private String avatar;
     private String shortLink;
     private String inviteLink;
+    private boolean premiumActive;
+    private String premiumSplashURL;
+    private boolean premiumAutoFetch;
     private int standardBannerID;
+    private String premiumBannerURL;
     private String owner;
-    private int status;
+    private int status; //TODO: Enum класс смотреть либу
     private ResourceRating[] ratings;
     private List<String> tags;
     private String prefix;
@@ -30,14 +37,6 @@ public class BotInfo {
     private Developers[] developers;
     private int upCount;
     private ResourceUp[] ups;
-
-    public ResourceUp[] getUps() {
-        return ups;
-    }
-
-    public void setUps(ResourceUp[] ups) {
-        this.ups = ups;
-    }
 
     public String getId() {
         return id;
@@ -95,12 +94,44 @@ public class BotInfo {
         this.inviteLink = inviteLink;
     }
 
+    public boolean isPremiumActive() {
+        return premiumActive;
+    }
+
+    public void setPremiumActive(boolean premiumActive) {
+        this.premiumActive = premiumActive;
+    }
+
+    public String getPremiumSplashURL() {
+        return premiumSplashURL;
+    }
+
+    public void setPremiumSplashURL(String premiumSplashURL) {
+        this.premiumSplashURL = premiumSplashURL;
+    }
+
+    public boolean isPremiumAutoFetch() {
+        return premiumAutoFetch;
+    }
+
+    public void setPremiumAutoFetch(boolean premiumAutoFetch) {
+        this.premiumAutoFetch = premiumAutoFetch;
+    }
+
     public int getStandardBannerID() {
         return standardBannerID;
     }
 
     public void setStandardBannerID(int standardBannerID) {
         this.standardBannerID = standardBannerID;
+    }
+
+    public String getPremiumBannerURL() {
+        return premiumBannerURL;
+    }
+
+    public void setPremiumBannerURL(String premiumBannerURL) {
+        this.premiumBannerURL = premiumBannerURL;
     }
 
     public String getOwner() {
@@ -111,8 +142,8 @@ public class BotInfo {
         this.owner = owner;
     }
 
-    public Status getStatus() {
-        return Status.find(status);
+    public int getStatus() {
+        return status;
     }
 
     public void setStatus(int status) {
@@ -127,8 +158,8 @@ public class BotInfo {
         this.ratings = ratings;
     }
 
-    public List<String> getTags() {
-        return tags;
+    public List<BotTags> getTags() {
+        return tags.stream().map(BotTags::find).toList();
     }
 
     public void setTags(List<String> tags) {
@@ -172,7 +203,6 @@ public class BotInfo {
     }
 
     public void setLibrary(int library) {
-        System.out.println("library " + library);
         this.library = library;
     }
 
@@ -238,5 +268,13 @@ public class BotInfo {
 
     public void setUpCount(int upCount) {
         this.upCount = upCount;
+    }
+
+    public ResourceUp[] getUps() {
+        return ups;
+    }
+
+    public void setUps(ResourceUp[] ups) {
+        this.ups = ups;
     }
 }

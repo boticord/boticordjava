@@ -1,11 +1,11 @@
-package org.boticordjava.api.entity.bot.botinfo;
+package org.boticordjava.api.entity.enums;
 
 public enum Status {
 
-    Hidden("0"),
-    Public("1"),
-    Banned("2"),
-    Pending("3");
+    HIDDEN("0"),
+    PUBLIC("1"),
+    BANNED("2"),
+    PENDING("3");
 
     private final String value;
 

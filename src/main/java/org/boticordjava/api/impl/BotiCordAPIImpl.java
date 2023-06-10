@@ -4,6 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.meilisearch.sdk.Client;
+import com.meilisearch.sdk.Config;
+import com.meilisearch.sdk.Index;
+import com.meilisearch.sdk.exceptions.MeilisearchException;
+import com.meilisearch.sdk.model.SearchResult;
 import okhttp3.HttpUrl;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -13,10 +18,13 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.boticordjava.api.ResponseHandler;
 import org.boticordjava.api.entity.ErrorResponse;
 import org.boticordjava.api.entity.ErrorResponseToMany;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
+import org.boticordjava.api.entity.bot.stats.BotStats;
+import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
+import org.boticordjava.api.entity.servers.serverssearch.ServersSearch;
+import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
@@ -25,6 +33,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BotiCordAPIImpl implements BotiCordAPI {
 
@@ -32,10 +42,12 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
     private final Gson gson;
     private final String token;
+    private final String searchApiKey;
     private final boolean devMode;
 
-    protected BotiCordAPIImpl(String token, boolean devMode) {
+    protected BotiCordAPIImpl(String token, String searchApiKey, boolean devMode) {
         this.token = token;
+        this.searchApiKey = searchApiKey;
         this.devMode = devMode;
 
         baseUrl = new HttpUrl.Builder()
@@ -48,7 +60,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public BotInfo setStats(@NotNull String botId, int members, int guilds, int shards) throws UnsuccessfulHttpException {
+    public BotInfo setBotStats(@NotNull String botId, BotStats botStats) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bots")
                 .addPathSegment(botId)
@@ -58,9 +70,9 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         JSONObject json = new JSONObject();
 
         try {
-            json.put("members", members);
-            json.put("guilds", guilds);
-            json.put("shards", shards);
+            json.put("members", botStats.getMembers());
+            json.put("guilds", botStats.getGuilds());
+            json.put("shards", botStats.getShards());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -80,7 +92,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 //    }
 
     @Override
-    public BotInfo getBotInformation(@NotNull String botId) throws UnsuccessfulHttpException {
+    public BotInfo getBotInfo(@NotNull String botId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bots")
                 .addPathSegment(botId)
@@ -88,14 +100,38 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return get(url, new DefaultResponseTransformer<>(gson, BotInfo.class)).getResult();
     }
 
-//    @Override
-//    public ServerInfo getServerInformation(@NotNull String botId) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("server")
-//                .addPathSegment(botId)
-//                .build();
-//        return get(url, new DefaultResponseTransformer<>(ServerInfo.class, gson));
-//    }
+    @Override
+    public ServerInfo getServerInfo(@NotNull String serverId) throws UnsuccessfulHttpException {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("servers")
+                .addPathSegment(serverId)
+                .build();
+        return get(url, new DefaultResponseTransformer<>(gson, ServerInfo.class)).getResult();
+    }
+
+    @Override
+    public ServersSearch[] searchServers(String text) throws MeilisearchException, IllegalArgumentException {
+        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+
+        Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
+        Index index = client.index("servers");
+        SearchResult searchResult = index.search(text);
+
+        ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
+
+        for (HashMap<String, Object> hit : hits) {
+            for (String key : hit.keySet()) {
+                Object value = hit.get(key);
+
+
+                System.out.println(key + ": " + value);
+            }
+            System.out.println();
+        }
+
+
+        return null;
+    }
 
 //    @Override
 //    public Comments[] getServerComments(@NotNull String serverId) throws UnsuccessfulHttpException {
@@ -193,53 +229,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 //    }
 
 //    @Override
-//    public ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("server")
-//                .build();
-//
-//        JSONObject json = new JSONObject();
-//
-//        try {
-//
-//            json.put("serverID", serverId);
-//            json.put("up", up);
-//            json.put("status", status);
-//
-//            if (serverName != null)
-//                json.put("serverName", serverName);
-//
-//            if (serverAvatar != null)
-//                json.put("serverAvatar", serverAvatar);
-//
-//            if (serverMembersAllCount != null)
-//                json.put("serverMembersAllCount", serverMembersAllCount);
-//
-//            if (serverMembersOnlineCount != null)
-//                json.put("serverMembersOnlineCount", serverMembersOnlineCount);
-//
-//            if (serverOwnerID != null)
-//                json.put("serverOwnerID", serverOwnerID);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return post(url, json, new DefaultResponseTransformer<>(ResultServer.class, gson));
-//    }
-
-    //TODO: разобраться
-//    @Override
-//    public DeveloperBots[] getDeveloperBots(String userId) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("bots")
-//                .addPathSegment(userId)
-//                .build();
-//
-//        return get(url, new DefaultResponseTransformer<>(DeveloperBots[].class, gson));
-//    }
-
-//    @Override
 //    public UserComments getUserComments(String userId) throws UnsuccessfulHttpException {
 //        HttpUrl url = baseUrl.newBuilder()
 //                .addPathSegment("profile")
@@ -250,15 +239,14 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 //        return get(url, new DefaultResponseTransformer<>(UserComments.class, gson));
 //    }
 
-//    @Override
-//    public UserProfile getUserProfile(String userId) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("profile")
-//                .addPathSegment(userId)
-//                .build();
-//
-//        return get(url, new DefaultResponseTransformer<>(UserProfile.class, gson));
-//    }
+    @Override
+    public UserProfile getUserProfile(String userId) throws UnsuccessfulHttpException {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("users")
+                .addPathSegment(userId)
+                .build();
+        return get(url, new DefaultResponseTransformer<>(gson, UserProfile.class)).getResult();
+    }
 
     private String tokenHandler() {
         return this.token;
