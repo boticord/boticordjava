@@ -8,7 +8,6 @@ public class ServersSearch extends AbstractComment {
     private String discordBanner;
     private ServerTags[] tags;
 
-
     public String getDiscordBanner() {
         return discordBanner;
     }

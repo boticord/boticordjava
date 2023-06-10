@@ -1,5 +1,8 @@
 package org.boticordjava.api.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -21,10 +24,11 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.boticordjava.api.entity.ErrorResponse;
 import org.boticordjava.api.entity.ErrorResponseToMany;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
+import org.boticordjava.api.entity.bot.botssearch.BotsSearch;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
-import org.boticordjava.api.entity.servers.serverssearch.ServersSearch;
 import org.boticordjava.api.entity.users.profile.UserProfile;
+import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
@@ -35,6 +39,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class BotiCordAPIImpl implements BotiCordAPI {
 
@@ -80,17 +85,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return post(url, json, new DefaultResponseTransformer<>(gson, BotInfo.class)).getResult();
     }
 
-//    @Override
-//    public Comments[] getBotComments(@NotNull String botId) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("bot")
-//                .addPathSegment(botId)
-//                .addPathSegment("comments")
-//                .build();
-//
-//        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
-//    }
-
     @Override
     public BotInfo getBotInfo(@NotNull String botId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
@@ -110,137 +104,58 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public ServersSearch[] searchServers(String text) throws MeilisearchException, IllegalArgumentException {
+    public List<ServerInfo> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
         if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
-
         Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
         Index index = client.index("servers");
         SearchResult searchResult = index.search(text);
-
         ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
-
+        List<ServerInfo> serverInfoList = new ArrayList<>(hits.size() + 1);
         for (HashMap<String, Object> hit : hits) {
-            for (String key : hit.keySet()) {
-                Object value = hit.get(key);
-
-
-                System.out.println(key + ": " + value);
-            }
-            System.out.println();
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(hit);
+            ServerInfo serverInfo = gson.fromJson(json, ServerInfo.class);
+            serverInfoList.add(serverInfo);
         }
-
-
-        return null;
+        return serverInfoList;
     }
 
-//    @Override
-//    public Comments[] getServerComments(@NotNull String serverId) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("server")
-//                .addPathSegment(serverId)
-//                .addPathSegment("comments")
-//                .build();
-//        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson));
-//    }
-
-//    @Override
-//    public GetShortLink[] getUserLinks(@NotNull String code) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("links")
-//                .addPathSegment("get")
-//                .build();
-//
-//        JSONObject json = new JSONObject();
-//
-//        json.put("code", code);
-//
-//        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson));
-//    }
-
-//    @Override
-//    public GetShortLink[] getUserLinks() throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("links")
-//                .addPathSegment("get")
-//                .build();
-//        JSONObject json = new JSONObject();
-//
-//        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson));
-//    }
-
-//    @Override
-//    public GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("links")
-//                .addPathSegment("create")
-//                .build();
-//
-//        JSONObject json = new JSONObject();
-//
-//        json.put("code", code);
-//        json.put("link", link);
-//        json.put("domain", domain.get());
-//
-//        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson));
-//    }
-
-//    @Override
-//    public GetShortLink createShortLink(@NotNull String code, @NotNull String link) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("links")
-//                .addPathSegment("create")
-//                .build();
-//
-//        JSONObject json = new JSONObject();
-//
-//        json.put("code", code);
-//        json.put("link", link);
-//        json.put("domain", 1);
-//
-//        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson));
-//    }
-
-//    @Override
-//    public Result deleteShortLink(@NotNull String code) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("links")
-//                .addPathSegment("delete")
-//                .build();
-//
-//        JSONObject json = new JSONObject();
-//        json.put("code", code);
-//
-//        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
-//    }
-
-//    @Override
-//    public Result deleteShortLink(@NotNull String code, @NotNull Domain domain) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("links")
-//                .addPathSegment("delete")
-//                .build();
-//
-//        JSONObject json = new JSONObject();
-//
-//        json.put("code", code);
-//        json.put("domain", domain.get());
-//
-//        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson));
-//    }
-
-//    @Override
-//    public UserComments getUserComments(String userId) throws UnsuccessfulHttpException {
-//        HttpUrl url = baseUrl.newBuilder()
-//                .addPathSegment("profile")
-//                .addPathSegment(userId)
-//                .addPathSegment("comments")
-//                .build();
-//
-//        return get(url, new DefaultResponseTransformer<>(UserComments.class, gson));
-//    }
+    @Override
+    public List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
+        Index index = client.index("servers");
+        SearchResult searchResult = index.search(text);
+        ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
+        List<BotsSearch> botsSearchList = new ArrayList<>(hits.size() + 1);
+        for (HashMap<String, Object> hit : hits) {
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(hit);
+            BotsSearch botsSearch = gson.fromJson(json, BotsSearch.class);
+            botsSearchList.add(botsSearch);
+        }
+        return botsSearchList;
+    }
 
     @Override
-    public UserProfile getUserProfile(String userId) throws UnsuccessfulHttpException {
+    public List<UsersCommentSearch> searchUserComments(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
+        Index index = client.index("servers");
+        SearchResult searchResult = index.search(text);
+        ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
+        List<UsersCommentSearch> usersCommentSearchesList = new ArrayList<>(hits.size() + 1);
+        for (HashMap<String, Object> hit : hits) {
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(hit);
+            UsersCommentSearch usersCommentSearch = gson.fromJson(json, UsersCommentSearch.class);
+            usersCommentSearchesList.add(usersCommentSearch);
+        }
+        return usersCommentSearchesList;
+    }
+
+    @Override
+    public UserProfile getUserProfile(@NotNull String userId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("users")
                 .addPathSegment(userId)

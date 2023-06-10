@@ -1,13 +1,17 @@
 package org.boticordjava.api.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meilisearch.sdk.exceptions.MeilisearchException;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
+import org.boticordjava.api.entity.bot.botssearch.BotsSearch;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
-import org.boticordjava.api.entity.servers.serverssearch.ServersSearch;
 import org.boticordjava.api.entity.users.profile.UserProfile;
+import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public interface BotiCordAPI {
 
@@ -18,7 +22,7 @@ public interface BotiCordAPI {
      *                <p>jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
      * @return {@link BotInfo}
      */
-    BotInfo setBotStats(String botId, BotStats botStats) throws UnsuccessfulHttpException;
+    BotInfo setBotStats(@NotNull String botId, BotStats botStats) throws UnsuccessfulHttpException;
 
     /**
      * @param botId String botId or shortCode
@@ -33,47 +37,28 @@ public interface BotiCordAPI {
     ServerInfo getServerInfo(@NotNull String serverId) throws UnsuccessfulHttpException;
 
     /**
-     * Example:
-     * <p> Comments[] comments = api.getBotComments();
-     * <p> for (int i = 0; i < comments.length; i++) {
-     * <p>   System.out.println(comments[i].getUserId());
-     * <p> }
-     *
-     * @param botId String botId or shortCode
-     * @return {@link Comments}
+     * @param text String text
+     * @return {@link List<UsersCommentSearch>}
      */
-//    Comments[] getBotComments(@NotNull String botId) throws UnsuccessfulHttpException;
-
-    /**
-     * @param serverId String serverID
-     *                 <p>
-     *                 Example:
-     *                 <p> Comments[] comments = api.getServerComments(serverId);
-     *                 <p> for (int i = 0; i < comments.length; i++) {
-     *                 <p>   System.out.println(comments[i].getUserId());
-     *                 <p> }
-     * @return {@link Comments}
-     */
-//    Comments[] getServerComments(@NotNull String serverId) throws UnsuccessfulHttpException;
-
+    List<UsersCommentSearch> searchUserComments(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException ;
 
     /**
      * @param text String text
-     * @return {@link ServersSearch[]}
+     * @return {@link List<ServerInfo>}
      */
-    ServersSearch[] searchServers(String text) throws MeilisearchException, IllegalArgumentException;
+    List<ServerInfo> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
 
     /**
-     * @param userId String userId
-     * @return {@link UserComments}
+     * @param text String text
+     * @return {@link List<BotsSearch>}
      */
-//    UserComments getUserComments(String userId) throws UnsuccessfulHttpException;
+    List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
 
     /**
      * @param userId String userId
      * @return {@link UserProfile}
      */
-    UserProfile getUserProfile(String userId) throws UnsuccessfulHttpException;
+    UserProfile getUserProfile(@NotNull String userId) throws UnsuccessfulHttpException;
 
     class Builder {
 
