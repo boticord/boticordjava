@@ -124,7 +124,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     public List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
         if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
         Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
-        Index index = client.index("servers");
+        Index index = client.index("bots");
         SearchResult searchResult = index.search(text);
         ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
         List<BotsSearch> botsSearchList = new ArrayList<>(hits.size() + 1);
@@ -141,7 +141,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     public List<UsersCommentSearch> searchUserComments(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
         if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
         Client client = new Client(new Config("https://api.arbuz.pro/search/", searchApiKey));
-        Index index = client.index("servers");
+        Index index = client.index("comments");
         SearchResult searchResult = index.search(text);
         ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
         List<UsersCommentSearch> usersCommentSearchesList = new ArrayList<>(hits.size() + 1);
