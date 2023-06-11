@@ -26,7 +26,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 <groupId>com.github.megoRU</groupId>
 <artifactId>boticordjava</artifactId>
-<version>v4.1</version>
+<version>v5.0</version>
 </dependency>
 
 ```
@@ -39,16 +39,12 @@ https://jitpack.io/#megoRU/boticordjava
 public class Main {
     public static void main(String[] args) {
         BotiCordAPI api = new BotiCordAPI.Builder()
-                .tokenEnum(TokenEnum.BOT)
-                .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
+                .token("eyJhbGciOiJIUzI1NiIsInR5cCI****.")
                 .build();
 
         try {
-            Comments[] comments = api.getBotComments("808277484524011531");
-
-            for (int i = 0; i < comments.length; i++) {
-                System.out.println(comments[i].getText());
-            }
+            List<UsersCommentSearch> commentBotSearchList = api.searchUserComments("808277484524011531");
+            commentBotSearchList.forEach(g -> System.out.println(g.getContent()));
         } catch (UnsuccessfulHttpException e) {
             System.out.println(e.getMessage());
         }
@@ -62,13 +58,12 @@ public class Main {
 public class Main {
     public static void main(String[] args) {
         BotiCordAPI api = new BotiCordAPI.Builder()
-                .tokenEnum(TokenEnum.BOT)
-                .token("319bbc0e-0743-4d9c-872b-e547d5e8fd0d")
+                .token("eyJhbGciOiJIUzI1NiIsInR5cCI****.")
                 .build();
 
         try {
-            Result result = api.setStats(500, 1, 2000);
-            System.out.println(result);
+            BotStats botStats = new BotStats(200, 4, 1);
+            api.setBotStats("974297735559806986", botStats);
         } catch (UnsuccessfulHttpException e) {
             System.out.println(e.getMessage());
         }
@@ -108,7 +103,7 @@ public class Main {
 1. [Gson](https://github.com/google/gson)
 2. [Apache HttpClient](https://github.com/apache/httpcomponents-client)
 3. [JSON-java](https://github.com/stleary/JSON-java)
-4. [okhttp](https://github.com/square/okhttp)
+4. [OkHttp](https://github.com/square/okhttp)
 
 ## Links
 

@@ -4,6 +4,13 @@ public class BotStats {
 
     private Integer members;
     private Integer guilds;
+
+    public BotStats(Integer members, Integer guilds, Integer shards) {
+        this.members = members;
+        this.guilds = guilds;
+        this.shards = shards;
+    }
+
     private Integer shards;
 
     public Integer getMembers() {

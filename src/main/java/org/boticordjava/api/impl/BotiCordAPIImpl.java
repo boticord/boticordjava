@@ -249,8 +249,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                                     "code": 502,
                                     "message": "Bad Gateway"
                                   }
-                                }
-                                """;
+                                }""";
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                         throw new UnsuccessfulHttpException(502, result.getErrors()[0].getMessage());
                     }

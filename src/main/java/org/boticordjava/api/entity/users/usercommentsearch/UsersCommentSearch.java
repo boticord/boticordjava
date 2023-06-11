@@ -1,7 +1,5 @@
 package org.boticordjava.api.entity.users.usercommentsearch;
 
-import java.time.LocalDateTime;
-
 public class UsersCommentSearch {
 
     private String id;
@@ -9,7 +7,7 @@ public class UsersCommentSearch {
     private String content;
     private int rating;
     private String resource;
-    private LocalDateTime created;
+    private long created;
     private String modReply;
 
     public String getId() {
@@ -52,11 +50,11 @@ public class UsersCommentSearch {
         this.resource = resource;
     }
 
-    public LocalDateTime getCreated() {
+    public long getCreated() {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(long created) {
         this.created = created;
     }
 
