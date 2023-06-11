@@ -48,7 +48,7 @@ import java.util.List;
 public class BotiCordAPIImpl implements BotiCordAPI {
 
     private final HttpUrl baseUrl;
-    private final String searchURL = "https://api.arbuz.pro/search/";
+    private final String searchURL = "https://api.boticord.top/search/";
     private final Gson gson;
     private final String token;
     private final String searchApiKey;
@@ -59,8 +59,8 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         this.devMode = devMode;
         baseUrl = new HttpUrl.Builder()
                 .scheme("https")
-                .host("api.arbuz.pro")
-//                .addPathSegment("v3")
+                .host("api.boticord.top")
+                .addPathSegment("v3")
                 .build();
 
         this.gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
