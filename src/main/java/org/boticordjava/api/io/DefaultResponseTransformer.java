@@ -1,19 +1,24 @@
 package org.boticordjava.api.io;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.boticordjava.api.ResponseHandler;
 
-public class DefaultResponseTransformer<E> implements ResponseTransformer<E> {
+import java.lang.reflect.Type;
 
-    private final Class<E> aClass;
+public class DefaultResponseTransformer<E> implements ResponseTransformer<ResponseHandler<E>> {
+
     private final Gson gson;
+    private final Class<E> resultClass;
 
-    public DefaultResponseTransformer(Class<E> aClass, Gson gson) {
-        this.aClass = aClass;
+    public DefaultResponseTransformer(Gson gson, Class<E> resultClass) {
         this.gson = gson;
+        this.resultClass = resultClass;
     }
 
     @Override
-    public E transform(String response) {
-        return gson.fromJson(response, aClass);
+    public ResponseHandler<E> transform(String response) {
+        Type responseType = TypeToken.getParameterized(ResponseHandler.class, resultClass).getType();
+        return gson.fromJson(response, responseType);
     }
 }

@@ -1,9 +1,16 @@
 package org.boticordjava.api.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.*;
+import com.meilisearch.sdk.Client;
+import com.meilisearch.sdk.Config;
+import com.meilisearch.sdk.Index;
+import com.meilisearch.sdk.SearchRequest;
+import com.meilisearch.sdk.exceptions.MeilisearchException;
+import com.meilisearch.sdk.model.SearchResult;
+import com.meilisearch.sdk.model.Searchable;
 import okhttp3.HttpUrl;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -13,299 +20,205 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.boticordjava.api.BoticordUtils;
-import org.boticordjava.api.entity.Enums.Domain;
-import org.boticordjava.api.entity.Enums.Endpoints;
-import org.boticordjava.api.entity.Enums.TokenEnum;
 import org.boticordjava.api.entity.ErrorResponse;
 import org.boticordjava.api.entity.ErrorResponseToMany;
-import org.boticordjava.api.entity.Result;
-import org.boticordjava.api.entity.ResultServer;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
-import org.boticordjava.api.entity.comments.Comments;
-import org.boticordjava.api.entity.links.GetShortLink;
+import org.boticordjava.api.entity.bot.botssearch.BotsSearch;
+import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
-import org.boticordjava.api.entity.users.botslist.DeveloperBots;
+import org.boticordjava.api.entity.servers.serverssearch.ServersSearch;
 import org.boticordjava.api.entity.users.profile.UserProfile;
-import org.boticordjava.api.entity.users.usercomments.UserComments;
+import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
 import org.boticordjava.api.io.DefaultResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class BotiCordAPIImpl implements BotiCordAPI {
 
     private final HttpUrl baseUrl;
-
+    private final String searchURL = "https://api.arbuz.pro/search/";
     private final Gson gson;
     private final String token;
-    private final TokenEnum tokenEnum;
-    private final int version;
+    private final String searchApiKey;
     private final boolean devMode;
 
-    protected BotiCordAPIImpl(String token, TokenEnum tokenEnum, boolean devMode) {
+    protected BotiCordAPIImpl(String token, boolean devMode) {
         this.token = token;
-        this.tokenEnum = tokenEnum;
-        this.version = 2;
         this.devMode = devMode;
-
         baseUrl = new HttpUrl.Builder()
                 .scheme("https")
-                .host("api.boticord.top")
-                .addPathSegment("v2")
+                .host("api.arbuz.pro")
+//                .addPathSegment("v3")
                 .build();
 
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+            private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+            @Override
+            public LocalDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                String replace = json.getAsJsonPrimitive().getAsString().replaceAll(".[0-9]+Z", "");
+                TemporalAccessor parse = formatter.parse(replace);
+                return LocalDateTime.from(parse);
+            }
+
+        }).setPrettyPrinting().create();
+
+        try {
+            this.searchApiKey = getSearchApiKey().getKey();
+        } catch (UnsuccessfulHttpException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
-    private void checks(Endpoints endpoint) {
-        boolean result = BoticordUtils.canSendRequestToEndpoint(endpoint, this.tokenEnum);
-        if (version == 2 && !result)
-            throw new IllegalArgumentException("TokenEnum." + tokenEnum + " is wrong for this: " + endpoint);
+    private SearchApiKey getSearchApiKey() throws UnsuccessfulHttpException {
+        HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("search-key")
+                .build();
+        return get(url, new DefaultResponseTransformer<>(gson, SearchApiKey.class)).getResult();
     }
 
     @Override
-    public Result setStats(int servers, int shards, int users) throws UnsuccessfulHttpException {
+    public BotInfo setBotStats(@NotNull String botId, BotStats botStats) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
+                .addPathSegment("bots")
+                .addPathSegment(botId)
                 .addPathSegment("stats")
                 .build();
 
         JSONObject json = new JSONObject();
 
         try {
-            json.put("servers", servers);
-            json.put("shards", shards);
-            json.put("users", users);
+            json.put("members", botStats.getMembers());
+            json.put("guilds", botStats.getGuilds());
+            json.put("shards", botStats.getShards());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson), Endpoints.POST_BOT_STATS);
+        return post(url, json, new DefaultResponseTransformer<>(gson, BotInfo.class)).getResult();
     }
 
     @Override
-    public Comments[] getBotComments(@NotNull String botId) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("bot")
-                .addPathSegment(botId)
-                .addPathSegment("comments")
-                .build();
-
-        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson), Endpoints.GET_BOT_COMMENTS);
-    }
-
-    @Override
-    public BotInfo getBotInformation(@NotNull String botId) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("bot")
-                .addPathSegment(botId)
-                .build();
-        return get(url, new DefaultResponseTransformer<>(BotInfo.class, gson), Endpoints.GET_BOT_INFO);
-    }
-
-    @Override
-    public ServerInfo getServerInformation(@NotNull String botId) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("server")
-                .addPathSegment(botId)
-                .build();
-        return get(url, new DefaultResponseTransformer<>(ServerInfo.class, gson), Endpoints.GET_SERVER_INFO);
-    }
-
-    @Override
-    public Comments[] getServerComments(@NotNull String serverId) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("server")
-                .addPathSegment(serverId)
-                .addPathSegment("comments")
-                .build();
-        return get(url, new DefaultResponseTransformer<>(Comments[].class, gson), Endpoints.GET_SERVER_COMMENTS);
-    }
-
-    @Override
-    public GetShortLink[] getUserLinks(@NotNull String code) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("links")
-                .addPathSegment("get")
-                .build();
-
-        JSONObject json = new JSONObject();
-
-        json.put("code", code);
-
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson), Endpoints.POST_LINKS_GET);
-    }
-
-    @Override
-    public GetShortLink[] getUserLinks() throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("links")
-                .addPathSegment("get")
-                .build();
-        JSONObject json = new JSONObject();
-
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink[].class, gson), Endpoints.POST_LINKS_GET);
-    }
-
-    @Override
-    public GetShortLink createShortLink(@NotNull String code, @NotNull String link, @NotNull Domain domain) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("links")
-                .addPathSegment("create")
-                .build();
-
-        JSONObject json = new JSONObject();
-
-        json.put("code", code);
-        json.put("link", link);
-        json.put("domain", domain.get());
-
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson), Endpoints.POST_LINKS_CREATE);
-    }
-
-    @Override
-    public GetShortLink createShortLink(@NotNull String code, @NotNull String link) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("links")
-                .addPathSegment("create")
-                .build();
-
-        JSONObject json = new JSONObject();
-
-        json.put("code", code);
-        json.put("link", link);
-        json.put("domain", 1);
-
-        return post(url, json, new DefaultResponseTransformer<>(GetShortLink.class, gson), Endpoints.POST_LINKS_CREATE);
-    }
-
-    @Override
-    public Result deleteShortLink(@NotNull String code) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("links")
-                .addPathSegment("delete")
-                .build();
-
-        JSONObject json = new JSONObject();
-        json.put("code", code);
-
-        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson), Endpoints.POST_LINKS_DELETE);
-    }
-
-    @Override
-    public Result deleteShortLink(@NotNull String code, @NotNull Domain domain) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("links")
-                .addPathSegment("delete")
-                .build();
-
-        JSONObject json = new JSONObject();
-
-        json.put("code", code);
-        json.put("domain", domain.get());
-
-        return post(url, json, new DefaultResponseTransformer<>(Result.class, gson), Endpoints.POST_LINKS_DELETE);
-    }
-
-    @Override
-    public ResultServer setServerStats(@NotNull String serverId, int up, int status, @Nullable String serverName, @Nullable String serverAvatar, @Nullable String serverMembersAllCount, @Nullable String serverMembersOnlineCount, @Nullable String serverOwnerID) throws UnsuccessfulHttpException {
-        HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("server")
-                .build();
-
-        JSONObject json = new JSONObject();
-
-        try {
-
-            json.put("serverID", serverId);
-            json.put("up", up);
-            json.put("status", status);
-
-            if (serverName != null)
-                json.put("serverName", serverName);
-
-            if (serverAvatar != null)
-                json.put("serverAvatar", serverAvatar);
-
-            if (serverMembersAllCount != null)
-                json.put("serverMembersAllCount", serverMembersAllCount);
-
-            if (serverMembersOnlineCount != null)
-                json.put("serverMembersOnlineCount", serverMembersOnlineCount);
-
-            if (serverOwnerID != null)
-                json.put("serverOwnerID", serverOwnerID);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return post(url, json, new DefaultResponseTransformer<>(ResultServer.class, gson), Endpoints.POST_SERVER_STATS);
-    }
-
-    //TODO: разобраться
-    @Override
-    public DeveloperBots[] getDeveloperBots(String userId) throws UnsuccessfulHttpException {
+    public BotInfo getBotInfo(@NotNull String botId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
                 .addPathSegment("bots")
-                .addPathSegment(userId)
+                .addPathSegment(botId)
                 .build();
-
-        return get(url, new DefaultResponseTransformer<>(DeveloperBots[].class, gson), Endpoints.GET_USER_BOTS);
+        return get(url, new DefaultResponseTransformer<>(gson, BotInfo.class)).getResult();
     }
 
     @Override
-    public UserComments getUserComments(String userId) throws UnsuccessfulHttpException {
+    public ServerInfo getServerInfo(@NotNull String serverId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("profile")
-                .addPathSegment(userId)
-                .addPathSegment("comments")
+                .addPathSegment("servers")
+                .addPathSegment(serverId)
                 .build();
-
-        return get(url, new DefaultResponseTransformer<>(UserComments.class, gson), Endpoints.GET_USER_COMMENTS);
+        return get(url, new DefaultResponseTransformer<>(gson, ServerInfo.class)).getResult();
     }
 
     @Override
-    public UserProfile getUserProfile(String userId) throws UnsuccessfulHttpException {
+    public List<ServersSearch> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        Client client = new Client(new Config(searchURL, searchApiKey));
+        Index index = client.index("servers");
+        SearchResult searchResult = index.search(text);
+        ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
+        List<ServersSearch> serverInfoList = new ArrayList<>(hits.size() + 1);
+        for (HashMap<String, Object> hit : hits) {
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(hit);
+            ServersSearch serverInfo = gson.fromJson(json, ServersSearch.class);
+            serverInfoList.add(serverInfo);
+        }
+        return serverInfoList;
+    }
+
+    @Override
+    public List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        Client client = new Client(new Config(searchURL, searchApiKey));
+        Index index = client.index("bots");
+        SearchResult searchResult = index.search(text);
+        ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
+        List<BotsSearch> botsSearchList = new ArrayList<>(hits.size() + 1);
+        for (HashMap<String, Object> hit : hits) {
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(hit);
+            System.out.println(json);
+            BotsSearch botsSearch = gson.fromJson(json, BotsSearch.class);
+            botsSearchList.add(botsSearch);
+        }
+        return botsSearchList;
+    }
+
+    @Override
+    public List<UsersCommentSearch> searchUserComments(@NotNull String resourceId) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        Client client = new Client(new Config(searchURL, searchApiKey));
+        String format = String.format("resource = %s", resourceId);
+        String[] filter = new String[]{format};
+        SearchRequest searchRequest = SearchRequest.builder()
+                .filter(filter)
+                .q("")
+                .build();
+        Index index = client.index("comments");
+        Searchable searchResult = index.search(searchRequest);
+        ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
+        List<UsersCommentSearch> usersCommentSearchesList = new ArrayList<>(hits.size() + 1);
+        for (HashMap<String, Object> hit : hits) {
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(hit);
+            UsersCommentSearch usersCommentSearch = gson.fromJson(json, UsersCommentSearch.class);
+            usersCommentSearchesList.add(usersCommentSearch);
+        }
+        return usersCommentSearchesList;
+    }
+
+    @Override
+    public UserProfile getUserProfile(@NotNull String userId) throws UnsuccessfulHttpException {
         HttpUrl url = baseUrl.newBuilder()
-                .addPathSegment("profile")
+                .addPathSegment("users")
                 .addPathSegment(userId)
                 .build();
-
-        return get(url, new DefaultResponseTransformer<>(UserProfile.class, gson), Endpoints.GET_USER_INFO);
+        return get(url, new DefaultResponseTransformer<>(gson, UserProfile.class)).getResult();
     }
 
     private String tokenHandler() {
-        if (tokenEnum != null) return tokenEnum.get() + this.token;
         return this.token;
     }
 
-    private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
+    private <E> E get(HttpUrl url, ResponseTransformer<E> responseTransformer) throws UnsuccessfulHttpException {
         HttpGet request = new HttpGet(url.uri());
         request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
 
-        return execute(request, responseTransformer, endpoints);
+        return execute(request, responseTransformer);
     }
 
-    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
+    private <E> E post(HttpUrl url, JSONObject jsonBody, ResponseTransformer<E> responseTransformer) throws UnsuccessfulHttpException {
         HttpPost request = new HttpPost(url.uri());
         request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         request.addHeader(HttpHeaders.AUTHORIZATION, tokenHandler());
 
         HttpEntity stringEntity = new StringEntity(jsonBody.toString(), ContentType.APPLICATION_JSON);
         request.setEntity(stringEntity);
-        return execute(request, responseTransformer, endpoints);
+        return execute(request, responseTransformer);
     }
 
-    @Nullable
-    private <E> E execute(ClassicHttpRequest request, ResponseTransformer<E> responseTransformer, Endpoints endpoints) throws UnsuccessfulHttpException {
-        checks(endpoints);
+    private <E> E execute(ClassicHttpRequest request, ResponseTransformer<E> responseTransformer) throws UnsuccessfulHttpException {
         CloseableHttpClient httpClient = HttpClients
                 .custom()
                 .setConnectionReuseStrategy(((requests, response, context) -> false))
@@ -322,33 +235,28 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 logResponse(response, body);
 
                 switch (statusCode) {
-                    case 400:
-                    case 401:
-                    case 403:
-                    case 404: {
-                        ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                        throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+                    case 201, 200 -> {
+                        return responseTransformer.transform(body);
                     }
-                    case 429: {
+                    case 429 -> {
                         ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
                         throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
                     }
-                    case 200: {
-                        return responseTransformer.transform(body);
-                    }
-                    case 502: {
-                        body = "{\n" +
-                                "  \"error\": {\n" +
-                                "    \"code\": 502,\n" +
-                                "    \"message\": \"Bad Gateway\"\n" +
-                                "  }\n" +
-                                "}";
+                    case 502 -> {
+                        body = """
+                                {
+                                  "error": {
+                                    "code": 502,
+                                    "message": "Bad Gateway"
+                                  }
+                                }""";
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                        throw new UnsuccessfulHttpException(502, result.getError().getMessage());
+                        throw new UnsuccessfulHttpException(502, result.getErrors()[0].getMessage());
                     }
-                    default:
+                    default -> {
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
-                        throw new UnsuccessfulHttpException(result.getError().getCode(), result.getError().getMessage());
+                        throw new UnsuccessfulHttpException(result.getErrors()[0].getCode(), result.getErrors()[0].getMessage());
+                    }
                 }
             } catch (ParseException e) {
                 throw new RuntimeException(e);
@@ -369,6 +277,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         if (!devMode) return;
         String status = String.format("StatusCode: %s Reason: %s", response.getCode(), response.getReasonPhrase());
         System.out.println(status);
+//        System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
         String prettyJsonString = gson.toJson(jsonElement);
         System.out.println(prettyJsonString);

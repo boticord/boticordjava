@@ -7,6 +7,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.webhooks.WebhookListener;
 import org.boticordjava.api.entity.webhooks.bump.bot.BotBump;
 import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
@@ -76,6 +77,8 @@ public class WebSocket {
                     return;
                 }
 
+                System.out.println(t.getResponseBody());
+
                 String hookKey = strings
                         .toString()
                         .replace("[", "")
@@ -101,16 +104,16 @@ public class WebSocket {
                         case EDIT_SERVER_COMMENT:
                         case DELETE_SERVER_COMMENT:
                         case NEW_BOT_COMMENT:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(CommentAction.class, gson);
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(gson, CommentAction.class);
                             break;
                         case NEW_BOT_BUMP:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(BotBump.class, gson);
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(gson, BotBump.class);
                             break;
                         case NEW_SERVER_BUMP:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(ServerBump.class, gson);
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(gson, ServerBump.class);
                             break;
                         case TEST_WEBHOOK_MESSAGE:
-                            defaultResponseTransformer = new DefaultResponseTransformer<>(TestMessage.class, gson);
+                            defaultResponseTransformer = new DefaultResponseTransformer<>(gson, TestMessage.class);
                             break;
                         default:
                             return;
