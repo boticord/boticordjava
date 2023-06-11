@@ -6,6 +6,7 @@ import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.bot.botssearch.BotsSearch;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
+import org.boticordjava.api.entity.servers.serverssearch.ServersSearch;
 import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
@@ -37,16 +38,15 @@ public interface BotiCordAPI {
     ServerInfo getServerInfo(@NotNull String serverId) throws UnsuccessfulHttpException;
 
     /**
-     * @param text String text
      * @return {@link List<UsersCommentSearch>}
      */
-    List<UsersCommentSearch> searchUserComments(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException ;
+    List<UsersCommentSearch> searchUserComments(@NotNull String resourceId) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
 
     /**
      * @param text String text
-     * @return {@link List<ServerInfo>}
+     * @return {@link List<ServersSearch>}
      */
-    List<ServerInfo> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
+    List<ServersSearch> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
 
     /**
      * @param text String text
@@ -64,7 +64,6 @@ public interface BotiCordAPI {
 
         // Required
         private String token;
-        private String searchApiKey;
         private boolean devMode;
 
         /**
@@ -72,11 +71,6 @@ public interface BotiCordAPI {
          */
         public Builder enableDevMode() {
             this.devMode = true;
-            return this;
-        }
-
-        public Builder searchApiKey(String searchApiKey) {
-            this.searchApiKey = searchApiKey;
             return this;
         }
 
@@ -95,7 +89,7 @@ public interface BotiCordAPI {
             if (token == null)
                 throw new IllegalArgumentException("The provided token cannot be null!");
 
-            return new BotiCordAPIImpl(token, searchApiKey, devMode);
+            return new BotiCordAPIImpl(token, devMode);
         }
     }
 }

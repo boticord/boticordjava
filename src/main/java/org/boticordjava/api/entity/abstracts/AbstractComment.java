@@ -1,5 +1,7 @@
 package org.boticordjava.api.entity.abstracts;
 
+import java.time.LocalDateTime;
+
 public abstract class AbstractComment {
 
     private String id;
@@ -10,7 +12,7 @@ public abstract class AbstractComment {
     private String invite;
     private boolean premiumActive;
     private int ups;
-    private String created; //TODO: "2023-05-22T22:12:15.637Z"
+    private LocalDateTime created;
     private int rating;
     private int banner;
     private int members;
@@ -79,11 +81,11 @@ public abstract class AbstractComment {
         this.ups = ups;
     }
 
-    public String getCreated() {
+    public LocalDateTime getCreated() {
         return created;
     }
 
-    public void setCreated(String created) {
+    public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 

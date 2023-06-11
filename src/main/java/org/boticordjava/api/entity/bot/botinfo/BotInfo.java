@@ -3,6 +3,7 @@ package org.boticordjava.api.entity.bot.botinfo;
 import org.boticordjava.api.entity.enums.BotTags;
 import org.boticordjava.api.entity.enums.Library;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class BotInfo {
@@ -25,7 +26,7 @@ public class BotInfo {
     private List<String> tags;
     private String prefix;
     private String discriminator;
-    private String createdDate; //TODO: "2023-05-22T22:12:15.637Z"
+    private LocalDateTime createdDate;
     private String supportServerInviteCode;
     private int library;
     private int guilds;
@@ -182,11 +183,11 @@ public class BotInfo {
         this.discriminator = discriminator;
     }
 
-    public String getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(String createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 

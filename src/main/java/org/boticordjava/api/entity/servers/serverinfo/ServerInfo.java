@@ -4,6 +4,7 @@ import org.boticordjava.api.entity.bot.botinfo.*;
 import org.boticordjava.api.entity.enums.ServerTags;
 import org.boticordjava.api.entity.users.profile.UserProfile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ServerInfo {
@@ -23,7 +24,7 @@ public class ServerInfo {
     private String owner;
     private int status;
     private ResourceRating[] ratings;
-    private String createdDate; //TODO: "2023-05-22T22:12:15.637Z"
+    private LocalDateTime createdDate;
     private int members;
     private String website;
     private List<String> tags;
@@ -151,11 +152,11 @@ public class ServerInfo {
         this.ratings = ratings;
     }
 
-    public String getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(String createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
