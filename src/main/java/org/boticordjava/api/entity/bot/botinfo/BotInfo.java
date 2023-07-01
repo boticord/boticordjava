@@ -5,6 +5,7 @@ import org.boticordjava.api.entity.enums.Library;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BotInfo {
 
@@ -160,7 +161,7 @@ public class BotInfo {
     }
 
     public List<BotTags> getTags() {
-        return tags.stream().map(BotTags::find).toList();
+        return tags.stream().map(BotTags::find).collect(Collectors.toList());
     }
 
     public void setTags(List<String> tags) {

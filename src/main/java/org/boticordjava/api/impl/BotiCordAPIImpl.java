@@ -238,25 +238,25 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                 logResponse(response, body);
 
                 switch (statusCode) {
-                    case 201, 200 -> {
+                    case 201:
+                    case 200: {
                         return responseTransformer.transform(body);
                     }
-                    case 429 -> {
+                    case 429: {
                         ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
                         throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
                     }
-                    case 502 -> {
-                        body = """
-                                {
-                                  "error": {
-                                    "code": 502,
-                                    "message": "Bad Gateway"
-                                  }
-                                }""";
+                    case 502: {
+                        body = "{\n" +
+                                "  \"error\": {\n" +
+                                "    \"code\": 502,\n" +
+                                "    \"message\": \"Bad Gateway\"\n" +
+                                "  }\n" +
+                                "}";
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                         throw new UnsuccessfulHttpException(502, result.getErrors()[0].getMessage());
                     }
-                    default -> {
+                    default: {
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                         throw new UnsuccessfulHttpException(result.getErrors()[0].getCode(), result.getErrors()[0].getMessage());
                     }

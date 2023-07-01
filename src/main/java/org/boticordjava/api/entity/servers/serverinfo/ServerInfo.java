@@ -6,6 +6,7 @@ import org.boticordjava.api.entity.users.profile.UserProfile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ServerInfo {
 
@@ -177,7 +178,7 @@ public class ServerInfo {
     }
 
     public List<ServerTags> getTags() {
-        return tags.stream().map(ServerTags::find).toList();
+        return tags.stream().map(ServerTags::find).collect(Collectors.toList());
     }
 
     public void setTags(List<String> tags) {

@@ -24,11 +24,23 @@ public class Observer {
         Type type = Type.valueOf(commentAction.getType().toUpperCase());
         for (ListenerAdapter hl : listeners) {
             switch (type) {
-                case EDIT_BOT_COMMENT, DELETE_BOT_COMMENT, NEW_SERVER_COMMENT, EDIT_SERVER_COMMENT, DELETE_SERVER_COMMENT, NEW_BOT_COMMENT ->
-                        hl.onCommentEvent((CommentAction) commentAction);
-                case NEW_BOT_BUMP -> hl.onBotBumpEvent((BotBump) commentAction);
-                case NEW_SERVER_BUMP -> hl.onServerBumpEvent((ServerBump) commentAction);
-                case TEST_WEBHOOK_MESSAGE -> hl.onTestEvent((TestMessage) commentAction);
+                case EDIT_BOT_COMMENT:
+                case DELETE_BOT_COMMENT:
+                case NEW_SERVER_COMMENT:
+                case EDIT_SERVER_COMMENT:
+                case DELETE_SERVER_COMMENT:
+                case NEW_BOT_COMMENT: {
+                    hl.onCommentEvent((CommentAction) commentAction);
+                }
+                case NEW_BOT_BUMP: {
+                    hl.onBotBumpEvent((BotBump) commentAction);
+                }
+                case NEW_SERVER_BUMP: {
+                    hl.onServerBumpEvent((ServerBump) commentAction);
+                }
+                case TEST_WEBHOOK_MESSAGE: {
+                    hl.onTestEvent((TestMessage) commentAction);
+                }
             }
         }
     }
