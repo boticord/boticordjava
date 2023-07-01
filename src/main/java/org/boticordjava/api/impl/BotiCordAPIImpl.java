@@ -51,7 +51,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     private final String searchURL = "https://api.boticord.top/search/";
     private final Gson gson;
     private final String token;
-    private final String searchApiKey;
+    private String searchApiKey = null;
     private final boolean devMode;
 
     protected BotiCordAPIImpl(String token, boolean devMode) {
@@ -74,13 +74,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
             }
 
         }).setPrettyPrinting().create();
-
-        try {
-            this.searchApiKey = getSearchApiKey().getKey();
-        } catch (UnsuccessfulHttpException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     private SearchApiKey getSearchApiKey() throws UnsuccessfulHttpException {
@@ -129,9 +122,19 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         return get(url, new DefaultResponseTransformer<>(gson, ServerInfo.class)).getResult();
     }
 
+    private void getApiSearchKey() {
+        try {
+            if (searchApiKey == null) {
+                this.searchApiKey = getSearchApiKey().getKey();
+            }
+        } catch (UnsuccessfulHttpException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public List<ServersSearch> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
-        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        getApiSearchKey();
         Client client = new Client(new Config(searchURL, searchApiKey));
         Index index = client.index("servers");
         SearchResult searchResult = index.search(text);
@@ -148,7 +151,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
     @Override
     public List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
-        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        getApiSearchKey();
         Client client = new Client(new Config(searchURL, searchApiKey));
         Index index = client.index("bots");
         SearchResult searchResult = index.search(text);
@@ -166,7 +169,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
     @Override
     public List<UsersCommentSearch> searchUserComments(@NotNull String resourceId) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
-        if (searchApiKey == null) throw new IllegalArgumentException("SearchApiKey is NULL!");
+        getApiSearchKey();
         Client client = new Client(new Config(searchURL, searchApiKey));
         String format = String.format("resource = %s", resourceId);
         String[] filter = new String[]{format};
