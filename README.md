@@ -26,7 +26,7 @@ https://jitpack.io/#megoRU/boticordjava
 <dependency>
 <groupId>com.github.megoRU</groupId>
 <artifactId>boticordjava</artifactId>
-<version>v5.1</version>
+<version>v5.3</version>
 </dependency>
 
 ```
@@ -71,29 +71,20 @@ public class Main {
 }
 ```
 
-### WebHooks
-
-Note: BotiCord supports only `HTTPS` you need proxy `ip:port` to `Apache`/`nginx` with **HTTPS**
+### WebSocket
 
 ```java
 public class Main {
     static class Comment extends ListenerAdapter {
         @Override
-        public void onCommentEvent(@NotNull CommentAction event) {
-            System.out.println(event.getType()); //delete_bot_comment
-        }
-    }
-
-    static class ServerBumpEvent extends ListenerAdapter {
-        @Override
-        public void onServerBumpEvent(@NotNull ServerBump event) {
-            System.out.println(event.getType()); //new_server_bump
+        public void onCommentEvent(@NotNull NotificationData event) {
+            System.out.println("event: " + event.getType());
         }
     }
 
     public static void main(String[] args) {
-        WebSocket webSocket = new WebSocket("3fbf63cefsfs2321a", null, 8080);
-        webSocket.addListener(new Comment(), new ServerBumpEvent());
+        BoticordWebSocket boticordWebSocket = new BoticordWebSocket("token");
+        boticordWebSocket.addListener(new Comment());
     }
 }
 ```

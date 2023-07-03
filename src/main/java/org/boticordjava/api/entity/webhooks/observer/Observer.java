@@ -1,11 +1,9 @@
 package org.boticordjava.api.entity.webhooks.observer;
 
+import org.boticordjava.api.entity.webhooks.notification.Notification;
+import org.boticordjava.api.entity.webhooks.notification.NotificationError;
 import org.boticordjava.api.entity.webhooks.WebhookListener;
-import org.boticordjava.api.entity.webhooks.bump.bot.BotBump;
-import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
-import org.boticordjava.api.entity.webhooks.comment.CommentAction;
-import org.boticordjava.api.entity.webhooks.comment.Type;
-import org.boticordjava.api.entity.webhooks.test.TestMessage;
+import org.boticordjava.api.entity.webhooks.notification.Type;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -20,26 +18,24 @@ public class Observer {
         Collections.addAll(this.listeners, listenerAdapter);
     }
 
-    public void handle(WebhookListener commentAction) {
-        Type type = Type.valueOf(commentAction.getType().toUpperCase());
+    public void handle(WebhookListener notification) {
+        Type type = Type.getType(notification.getType());
+        if (type == null) return;
         for (ListenerAdapter hl : listeners) {
             switch (type) {
-                case EDIT_BOT_COMMENT:
-                case DELETE_BOT_COMMENT:
-                case NEW_SERVER_COMMENT:
-                case EDIT_SERVER_COMMENT:
-                case DELETE_SERVER_COMMENT:
-                case NEW_BOT_COMMENT: {
-                    hl.onCommentEvent((CommentAction) commentAction);
+                case EDIT_COMMENT:
+                case DELETE_COMMENT:
+                case NEW_COMMENT: {
+                    hl.onCommentEvent(((Notification) notification).getData());
+                    break;
                 }
-                case NEW_BOT_BUMP: {
-                    hl.onBotBumpEvent((BotBump) commentAction);
+                case NEW_UP: {
+                    hl.onBumpEvent(((Notification) notification).getData());
+                    break;
                 }
-                case NEW_SERVER_BUMP: {
-                    hl.onServerBumpEvent((ServerBump) commentAction);
-                }
-                case TEST_WEBHOOK_MESSAGE: {
-                    hl.onTestEvent((TestMessage) commentAction);
+                case ERROR: {
+                    hl.onErrorEvent(((NotificationError) notification));
+                    break;
                 }
             }
         }

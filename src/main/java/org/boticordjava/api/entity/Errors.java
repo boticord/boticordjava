@@ -1,6 +1,8 @@
 package org.boticordjava.api.entity;
 
-public class Errors {
+import org.boticordjava.api.entity.webhooks.WebhookListener;
+
+public class Errors implements WebhookListener {
 
     private int code;
     private String message;
@@ -11,6 +13,11 @@ public class Errors {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String getType() {
+        return "error";
     }
 
     @Override

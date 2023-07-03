@@ -1,18 +1,14 @@
 package org.boticordjava.api.entity.webhooks.observer;
 
-import org.boticordjava.api.entity.webhooks.bump.bot.BotBump;
-import org.boticordjava.api.entity.webhooks.bump.server.ServerBump;
-import org.boticordjava.api.entity.webhooks.comment.CommentAction;
-import org.boticordjava.api.entity.webhooks.test.TestMessage;
+import org.boticordjava.api.entity.webhooks.notification.NotificationData;
+import org.boticordjava.api.entity.webhooks.notification.NotificationError;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class ListenerAdapter {
 
-    public void onTestEvent(@NotNull TestMessage event) {}
+    public void onCommentEvent(@NotNull NotificationData event) {}
 
-    public void onCommentEvent(@NotNull CommentAction event) {}
+    public void onBumpEvent(@NotNull NotificationData event) {}
 
-    public void onBotBumpEvent(@NotNull BotBump event) {}
-
-    public void onServerBumpEvent(@NotNull ServerBump event) {}
+    public void onErrorEvent(@NotNull NotificationError error) {}
 }
