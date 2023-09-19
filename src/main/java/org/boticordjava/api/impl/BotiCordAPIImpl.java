@@ -246,12 +246,26 @@ public class BotiCordAPIImpl implements BotiCordAPI {
                         ErrorResponseToMany result = gson.fromJson(body, ErrorResponseToMany.class);
                         throw new UnsuccessfulHttpException(result.getStatusCode(), result.getMessage());
                     }
+                    case 403: {
+                        body = "{\n" +
+                                "  \"errors\": [\n" +
+                                "    {\n" +
+                                "      \"code\": 403,\n" +
+                                "      \"message\": \"Bad Gateway\"\n" +
+                                "    }\n" +
+                                "  ]\n" +
+                                "}";
+                        ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
+                        throw new UnsuccessfulHttpException(403, result.getErrors()[0].getMessage());
+                    }
                     case 502: {
                         body = "{\n" +
-                                "  \"error\": {\n" +
-                                "    \"code\": 502,\n" +
-                                "    \"message\": \"Bad Gateway\"\n" +
-                                "  }\n" +
+                                "  \"errors\": [\n" +
+                                "    {\n" +
+                                "      \"code\": 502,\n" +
+                                "      \"message\": \"Bad Gateway\"\n" +
+                                "    }\n" +
+                                "  ]\n" +
                                 "}";
                         ErrorResponse result = gson.fromJson(body, ErrorResponse.class);
                         throw new UnsuccessfulHttpException(502, result.getErrors()[0].getMessage());
@@ -278,11 +292,14 @@ public class BotiCordAPIImpl implements BotiCordAPI {
 
     private void logResponse(ClassicHttpResponse response, String body) {
         if (!devMode) return;
-        String status = String.format("StatusCode: %s Reason: %s", response.getCode(), response.getReasonPhrase());
-        System.out.println(status);
-//        System.out.println(body);
-        JsonElement jsonElement = JsonParser.parseString(body);
-        String prettyJsonString = gson.toJson(jsonElement);
-        System.out.println(prettyJsonString);
+        try {
+            String status = String.format("StatusCode: %s Reason: %s", response.getCode(), response.getReasonPhrase());
+            System.out.println(status);
+            JsonElement jsonElement = JsonParser.parseString(body);
+            String prettyJsonString = gson.toJson(jsonElement);
+            System.out.println(prettyJsonString);
+        } catch (Exception e) {
+            System.out.println("JSON not valid!");
+        }
     }
 }
