@@ -11,7 +11,9 @@ import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface BotiCordAPI {
@@ -23,19 +25,28 @@ public interface BotiCordAPI {
      *                <p>jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
      * @return {@link BotInfo}
      */
-    BotInfo setBotStats(@NotNull String botId, BotStats botStats) throws UnsuccessfulHttpException;
+    BotInfo setBotStats(@NotNull String botId, BotStats botStats) throws IOException;
 
     /**
      * @param botId String botId or shortCode
      * @return {@link BotInfo}
      */
-    BotInfo getBotInfo(@NotNull String botId) throws UnsuccessfulHttpException;
+    @Nullable
+    BotInfo getBotInfo(@NotNull String botId) throws IOException;
 
     /**
      * @param serverId String botId or shortCode
      * @return {@link ServerInfo}
      */
-    ServerInfo getServerInfo(@NotNull String serverId) throws UnsuccessfulHttpException;
+    @Nullable
+    ServerInfo getServerInfo(@NotNull String serverId) throws IOException;
+
+    /**
+     * @param userId String userId
+     * @return {@link UserProfile}
+     */
+    @Nullable
+    UserProfile getUserProfile(@NotNull String userId) throws IOException;
 
     /**
      * @return {@link List<UsersCommentSearch>}
@@ -53,12 +64,6 @@ public interface BotiCordAPI {
      * @return {@link List<BotsSearch>}
      */
     List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
-
-    /**
-     * @param userId String userId
-     * @return {@link UserProfile}
-     */
-    UserProfile getUserProfile(@NotNull String userId) throws UnsuccessfulHttpException;
 
     class Builder {
 

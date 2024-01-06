@@ -1,20 +1,16 @@
 package org.boticordjava.api.entity.webhooks.notification;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.boticordjava.api.entity.Errors;
 import org.boticordjava.api.entity.webhooks.WebhookListener;
 
+@Getter
+@Setter
 public class NotificationError implements WebhookListener {
 
     private String event;
     public Errors data;
-
-    public String getEvent() {
-        return event;
-    }
-
-    public Errors getData() {
-        return data;
-    }
 
     @Override
     public String getType() {

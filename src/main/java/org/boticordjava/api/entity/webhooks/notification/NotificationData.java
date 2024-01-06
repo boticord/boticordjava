@@ -1,7 +1,11 @@
 package org.boticordjava.api.entity.webhooks.notification;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.boticordjava.api.entity.webhooks.WebhookListener;
 
+@Getter
+@Setter
 public class NotificationData implements WebhookListener {
 
     private String type;
@@ -10,26 +14,6 @@ public class NotificationData implements WebhookListener {
     private String id;
     private String user;
     private long happened;
-
-    public Payload getPayload() {
-        return payload;
-    }
-
-    public String getAffected() {
-        return affected;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public long getHappened() {
-        return happened;
-    }
 
     @Override
     public String getType() {

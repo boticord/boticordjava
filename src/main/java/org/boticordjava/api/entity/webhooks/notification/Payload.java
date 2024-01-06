@@ -1,7 +1,11 @@
 package org.boticordjava.api.entity.webhooks.notification;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
+@Getter
+@Setter
 public class Payload {
 
     private String content;
@@ -15,13 +19,5 @@ public class Payload {
     @Nullable
     public String getContent() {
         return content;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public int getUpCount() {
-        return upCount;
     }
 }
