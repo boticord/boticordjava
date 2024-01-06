@@ -24,7 +24,7 @@ public class BoticordWebSocket {
     private final Observer Observer = new Observer();
 
     public BoticordWebSocket(String token) throws URISyntaxException, IllegalAccessException {
-        if (token == null || token.equals("")) throw new IllegalAccessException("Token is NULL");
+        if (token == null || token.isEmpty()) throw new IllegalAccessException("Token is NULL");
         this.token = token;
         webSocketBuilder = new WebSocketBuilder(this);
         this.openConnection();

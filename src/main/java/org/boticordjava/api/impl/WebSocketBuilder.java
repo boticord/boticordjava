@@ -16,7 +16,7 @@ class WebSocketBuilder extends WebSocketClient {
     }
 
     @Override
-    public void onOpen(ServerHandshake handshakedata) {
+    public void onOpen(ServerHandshake serverHandshake) {
 
     }
 
