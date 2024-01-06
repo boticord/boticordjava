@@ -1,20 +1,13 @@
-package org.boticordjava.api;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meilisearch.sdk.exceptions.MeilisearchException;
-import org.boticordjava.api.entity.bot.botinfo.BotInfo;
-import org.boticordjava.api.entity.bot.botssearch.BotsSearch;
-import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
-import org.boticordjava.api.entity.servers.serverssearch.ServersSearch;
 import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
 import org.boticordjava.api.impl.BotiCordAPI;
-import org.boticordjava.api.io.UnsuccessfulHttpException;
 
-import java.io.IOException;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws UnsuccessfulHttpException, IOException, MeilisearchException {
+    public static void main(String[] args) throws MeilisearchException, JsonProcessingException {
         BotiCordAPI api = new BotiCordAPI.Builder()
                 .token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI1MDY5OTI2NTM4OTYyNTM0NyIsInRva2VuIjoibHZoVmhBODFGREk3QTJISWMwRWk4UlZSNUNyRFRIZlhOck5EVDRyOUwyNGcxZWI5ek9KbGE5eGUzMGQ3MGFFSCIsInJlZGlyZWN0Ijoi0YLRiyDQtNGD0LzQsNC7INGC0YPRgiDRh9GC0L4t0YLQviDQsdGD0LTQtdGCPyIsInBlcm1pc3Npb25zIjowLCJ0eXBlIjoiYm90IiwiaWF0IjoxNzA0NTQwNTY2fQ.RZIxV9QodUXSc2JdYkgVLY6qBc11CMcXGweBqzXu-UI")
                 .enableDevMode()
@@ -24,7 +17,5 @@ public class Main {
 
 
         System.out.println(serversSearches.size());
-//        System.out.println(botInfo.getDescription());
-
     }
 }
