@@ -1,10 +1,4 @@
-<div align="center ">
-
-<p>
-    <a href="https://boticord.top"><img src="https://megoru.ru/images/boticord/boticordapi.png"  alt="boticord.js"/></a>
-</p>
-
-</div>
+<img width="560" src="https://cdn.boticord.top/internal/github/boticord-java.svg" alt="boticord-java">
 
 # BotiCordJava
 
