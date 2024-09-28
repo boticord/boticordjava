@@ -12,7 +12,6 @@ import com.meilisearch.sdk.exceptions.MeilisearchException;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.Searchable;
 import okhttp3.*;
-import org.apache.hc.core5.http.HttpHeaders;
 import org.boticordjava.api.entity.api.request.*;
 import org.boticordjava.api.entity.api.response.*;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
@@ -149,7 +148,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         Request.Builder requestBuilder = new Request.Builder()
                 .url(apiRequest.getUrl())
                 .addHeader("Content-Type", "application/json")
-                .addHeader(HttpHeaders.AUTHORIZATION, token);
+                .addHeader("Authorization", token);
 
         if (apiRequest.getRequestMethod() == APIRequest.RequestMethod.GET) {
             requestBuilder = requestBuilder.get();
