@@ -109,7 +109,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         for (HashMap<String, Object> hit : hits) {
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(hit);
-            System.out.println(json);
             BotsSearch botsSearch = gson.fromJson(json, BotsSearch.class);
             botsSearchList.add(botsSearch);
         }
