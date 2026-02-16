@@ -1,9 +1,6 @@
 package org.boticordjava.api.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Config;
 import com.meilisearch.sdk.Index;
@@ -23,17 +20,16 @@ import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
 import org.boticordjava.api.utils.JsonUtil;
 import org.jetbrains.annotations.NotNull;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class BotiCordAPIImpl implements BotiCordAPI {
 
     private static final OkHttpClient CLIENT = new OkHttpClient();
-    private final String SEARCH_URL = "https://api.boticord.top/search/";
+    private final String SEARCH_URL = "https://api.boticord.top/v3/search/";
     private final String HOST = "https://api.boticord.top/v3";
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private final Gson gson = new Gson();
@@ -79,7 +75,6 @@ public class BotiCordAPIImpl implements BotiCordAPI {
         try {
             if (searchApiKey == null) {
                 this.searchApiKey = getSearchApiKey();
-                System.out.println(searchApiKey);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -87,7 +82,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public List<ServersSearch> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+    public List<ServersSearch> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException {
         getApiSearchKey();
         Client client = new Client(new Config(SEARCH_URL, searchApiKey));
         Index index = client.index("servers");
@@ -104,7 +99,7 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+    public List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException {
         getApiSearchKey();
         Client client = new Client(new Config(SEARCH_URL, searchApiKey));
         Index index = client.index("bots");
@@ -122,26 +117,31 @@ public class BotiCordAPIImpl implements BotiCordAPI {
     }
 
     @Override
-    public List<UsersCommentSearch> searchUserComments(@NotNull String resourceId) throws MeilisearchException, IllegalArgumentException, JsonProcessingException {
+    public List<UsersCommentSearch> searchUserComments(@NotNull String resourceId) throws MeilisearchException {
         getApiSearchKey();
         Client client = new Client(new Config(SEARCH_URL, searchApiKey));
-        String format = String.format("resource = %s", resourceId);
-        String[] filter = new String[]{format};
+
+        String filterFormat = String.format("resource = %s", resourceId);
+        String[] filter = new String[]{filterFormat};
+
         SearchRequest searchRequest = SearchRequest.builder()
                 .filter(filter)
                 .q("")
+                .hitsPerPage(18)
+                .page(1)
+                .sort(new String[]{"created:desc"})
                 .build();
+
         Index index = client.index("comments");
         Searchable searchResult = index.search(searchRequest);
-        ArrayList<HashMap<String, Object>> hits = searchResult.getHits();
-        List<UsersCommentSearch> usersCommentSearchesList = new ArrayList<>(hits.size() + 1);
-        for (HashMap<String, Object> hit : hits) {
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            String json = ow.writeValueAsString(hit);
-            UsersCommentSearch usersCommentSearch = gson.fromJson(json, UsersCommentSearch.class);
-            usersCommentSearchesList.add(usersCommentSearch);
+
+        List<UsersCommentSearch> result = new ArrayList<>();
+        for (HashMap<String, Object> hit : searchResult.getHits()) {
+            String json = new ObjectMapper().writeValueAsString(hit);
+            result.add(gson.fromJson(json, UsersCommentSearch.class));
         }
-        return usersCommentSearchesList;
+
+        return result;
     }
 
     private <T extends APIObject> T parseResponse(Class<T> tClass, @NotNull APIRequest apiRequest) throws IOException {

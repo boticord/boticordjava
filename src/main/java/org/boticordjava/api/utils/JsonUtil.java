@@ -22,7 +22,6 @@ public class JsonUtil {
 				TemporalAccessor parse = formatter.parse(replace);
 				return LocalDateTime.from(parse);
 			}
-
 		}).setPrettyPrinting().create();
 	}
 

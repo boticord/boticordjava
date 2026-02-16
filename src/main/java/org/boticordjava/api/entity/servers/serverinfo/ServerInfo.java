@@ -3,6 +3,7 @@ package org.boticordjava.api.entity.servers.serverinfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.boticordjava.api.entity.bot.botinfo.ResourceRating;
+import org.boticordjava.api.entity.bot.botinfo.ResourceReviews;
 import org.boticordjava.api.entity.bot.botinfo.ResourceUp;
 import org.boticordjava.api.entity.enums.ServerTags;
 import org.boticordjava.api.entity.users.profile.UserProfile;
@@ -30,6 +31,7 @@ public class ServerInfo {
     private String owner;
     private int status;
     private ResourceRating[] ratings;
+    private ResourceReviews[] reviews;
     private LocalDateTime createdDate;
     private int members;
     private String website;

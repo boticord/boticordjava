@@ -1,6 +1,5 @@
 package org.boticordjava.api.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meilisearch.sdk.exceptions.MeilisearchException;
 import org.boticordjava.api.entity.bot.botinfo.BotInfo;
 import org.boticordjava.api.entity.bot.botssearch.BotsSearch;
@@ -9,7 +8,6 @@ import org.boticordjava.api.entity.servers.serverinfo.ServerInfo;
 import org.boticordjava.api.entity.servers.serverssearch.ServersSearch;
 import org.boticordjava.api.entity.users.profile.UserProfile;
 import org.boticordjava.api.entity.users.usercommentsearch.UsersCommentSearch;
-import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,19 +49,19 @@ public interface BotiCordAPI {
     /**
      * @return {@link List<UsersCommentSearch>}
      */
-    List<UsersCommentSearch> searchUserComments(@NotNull String resourceId) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
+    List<UsersCommentSearch> searchUserComments(@NotNull String resourceId) throws MeilisearchException, IllegalArgumentException;
 
     /**
      * @param text String text
      * @return {@link List<ServersSearch>}
      */
-    List<ServersSearch> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
+    List<ServersSearch> searchServers(@NotNull String text) throws MeilisearchException, IllegalArgumentException;
 
     /**
      * @param text String text
      * @return {@link List<BotsSearch>}
      */
-    List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException, JsonProcessingException;
+    List<BotsSearch> searchBots(@NotNull String text) throws MeilisearchException, IllegalArgumentException;
 
     class Builder {
 

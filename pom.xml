@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.boticordjava.api</groupId>
     <artifactId>boticordjava</artifactId>
-    <version>6.0.1</version>
+    <version>6.1.0</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -15,32 +15,32 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.java-websocket/Java-WebSocket -->
+        <!-- Source: https://mvnrepository.com/artifact/org.java-websocket/Java-WebSocket -->
         <dependency>
             <groupId>org.java-websocket</groupId>
             <artifactId>Java-WebSocket</artifactId>
-            <version>1.5.7</version>
+            <version>1.6.0</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <!-- Source: https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.18.0</version>
+            <version>3.0.4</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <!-- Source: https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.11.0</version>
+            <version>2.13.2</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.meilisearch.sdk/meilisearch-java -->
+        <!-- Source: https://mvnrepository.com/artifact/com.meilisearch.sdk/meilisearch-java -->
         <dependency>
             <groupId>com.meilisearch.sdk</groupId>
             <artifactId>meilisearch-java</artifactId>
-            <version>0.14.0</version>
+            <version>0.19.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
@@ -50,25 +50,24 @@
             <version>5.0.0-alpha.14</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <!-- Source: https://mvnrepository.com/artifact/org.json/json -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20240303</version>
+            <version>20251224</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
+        <!-- Source: https://mvnrepository.com/artifact/org.jetbrains/annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>25.0.0</version>
+            <version>26.0.2-1</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
-            <scope>provided</scope>
+            <version>1.18.42</version>
         </dependency>
 
     </dependencies>
@@ -102,7 +101,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.1</version>
+                <version>3.14.1</version>
                 <configuration>
                     <source>11</source>
                     <target>11</target>

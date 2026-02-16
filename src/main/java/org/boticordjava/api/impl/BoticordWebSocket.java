@@ -1,6 +1,5 @@
 package org.boticordjava.api.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.boticordjava.api.entity.webhooks.notification.Notification;
@@ -12,6 +11,7 @@ import org.boticordjava.api.io.DefaultWebSocketResponseTransformer;
 import org.boticordjava.api.io.ResponseTransformer;
 import org.json.JSONException;
 import org.json.JSONObject;
+import tools.jackson.databind.ObjectMapper;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;

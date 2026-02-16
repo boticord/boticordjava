@@ -28,6 +28,7 @@ public class BotInfo {
     private String owner;
     private int status; //TODO: Enum класс смотреть либу
     private ResourceRating[] ratings;
+    private ResourceReviews[] reviews;
     private List<String> tags;
     private String prefix;
     private String discriminator;
