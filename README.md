@@ -21,7 +21,7 @@ Add JitPack repository and dependency:
 <dependency>
     <groupId>com.github.megoRU</groupId>
     <artifactId>boticordjava</artifactId>
-    <version>v6.0.1</version>
+    <version>v6.1.1</version>
 </dependency>
 ```
 
