@@ -2,6 +2,8 @@
 
 # BotiCordJava
 
+[![JitPack](https://jitpack.io/v/boticord/boticordjava.svg)](https://jitpack.io/#boticord/boticordjava)
+
 Java API wrapper for [BotiCord](https://boticord.top), created by [@megoRU](https://github.com/megoRU).
 
 ---
@@ -21,7 +23,7 @@ Add JitPack repository and dependency:
 <dependency>
     <groupId>com.github.megoRU</groupId>
     <artifactId>boticordjava</artifactId>
-    <version>v6.1.1</version>
+    <version>v6.1.2</version>
 </dependency>
 ```
 
